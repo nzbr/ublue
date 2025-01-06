@@ -15,7 +15,7 @@
 # - "base"
 #
 #  "aurora", "bazzite", "bluefin" or "ucore" may also be used but have different suffixes.
-ARG SOURCE_IMAGE="silverblue"
+ARG SOURCE_IMAGE="aurora"
 
 ## SOURCE_SUFFIX arg should include a hyphen and the appropriate suffix name
 # These examples all work for silverblue/kinoite/sericea/onyx/lazurite/vauxite/base
@@ -33,7 +33,7 @@ ARG SOURCE_IMAGE="silverblue"
 # - stable-zfs
 # - stable-nvidia-zfs
 # - (and the above with testing rather than stable)
-ARG SOURCE_SUFFIX="-main"
+ARG SOURCE_SUFFIX="-dx"
 
 ## SOURCE_TAG arg must be a version built for the specific image: eg, 39, 40, gts, latest
 ARG SOURCE_TAG="latest"
@@ -46,14 +46,18 @@ FROM ghcr.io/ublue-os/${SOURCE_IMAGE}${SOURCE_SUFFIX}:${SOURCE_TAG}
 
 ### 3. MODIFICATIONS
 ## make modifications desired in your image and install packages by modifying the build.sh script
-## the following RUN directive does all the things required to run "build.sh" as recommended.
 
-COPY build.sh /tmp/build.sh
-
-RUN mkdir -p /var/lib/alternatives && \
-    /tmp/build.sh && \
-    ostree container commit
+RUN mkdir -p /var/lib/alternatives && ostree container commit
 ## NOTES:
 # - /var/lib/alternatives is required to prevent failure with some RPM installs
 # - All RUN commands must end with ostree container commit
 #   see: https://coreos.github.io/rpm-ostree/container/#using-ostree-container-commit
+
+# RUN systemctl enable podman.socket && ostree container commit
+
+# Install 1password (system mode to enable browser integration)
+COPY 1password.asc /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
+COPY 1password.repo /etc/yum.repos.d/1password.repo
+# RUN rpm-ostree install 1password
+# \
+# && ostree container commit
