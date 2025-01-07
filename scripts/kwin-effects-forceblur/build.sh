@@ -45,8 +45,5 @@ git clone --depth 1 --branch v1.3.4 https://github.com/taj-ny/kwin-effects-force
 cd kwin-effects-forceblur
 
 mkdir build && cd build
-cmake ../ -DCMAKE_INSTALL_PREFIX=$pkgdir/usr
+cmake ../ -DCMAKE_INSTALL_PREFIX=/usr
 make -j$(nproc)
-
-mkdir -p $pkgdir
-make install
