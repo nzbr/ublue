@@ -1,0 +1,29 @@
+on:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '05 10 * * *' # 10:05am UTC everyday
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/README.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        image:
+          - nebula
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    secrets: inherit
+
+    uses: ./.github/workflows/build-image.yml
+    with:
+      image_name: ${{ matrix.image }}
