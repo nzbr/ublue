@@ -22,8 +22,5 @@ git clone --depth 1 --branch v0.6.7 https://github.com/matinlotfali/KDE-Rounded-
 cd KDE-Rounded-Corners
 
 mkdir build && cd build
-cmake ../ -DCMAKE_INSTALL_PREFIX=$pkgdir/usr
-make -j$(nproc)
-
-mkdir -p $pkgdir
-make install
+cmake ..
+cmake --build . -j$(nproc)
