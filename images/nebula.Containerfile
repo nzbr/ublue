@@ -36,5 +36,5 @@ RUN --mount=type=bind,source=./scripts,target=/scripts,z \
 
 RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     --mount=type=bind,from=build,source=/build,target=/build,z \
-    /scripts/rpm-ostree-require-password/install.sh && \
+    /scripts/tweak-rpm-ostree/install.sh && \
     ostree container commit
