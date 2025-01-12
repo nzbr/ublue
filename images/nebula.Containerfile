@@ -33,3 +33,8 @@ RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     --mount=type=bind,from=build,source=/build,target=/build,z \
     /scripts/kde-rounded-corners/install.sh && \
     ostree container commit
+
+RUN --mount=type=bind,source=./scripts,target=/scripts,z \
+    --mount=type=bind,from=build,source=/build,target=/build,z \
+    /scripts/rpm-ostree-require-password/install.sh && \
+    ostree container commit
