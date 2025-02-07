@@ -6,6 +6,7 @@ RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     /scripts/kwin-effects-forceblur/build.sh && \
     /scripts/kde-rounded-corners/build.sh
 
+
 FROM ghcr.io/ublue-os/aurora-dx:stable
 
 RUN mkdir -p /var/lib/alternatives && ostree container commit

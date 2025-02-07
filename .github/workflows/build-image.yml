@@ -8,12 +8,11 @@ on:
         required: true
 
 env:
-  MY_IMAGE_NAME: '${{ github.event.repository.name }}-${{ inputs.image_name }}' # the name of the image produced by this build, matches repo names
-  MY_IMAGE_DESC: 'My Customized Universal Blue Image'
+  IMAGE_NAME: '${{ github.event.repository.name }}-${{ inputs.image_name }}' # the name of the image produced by this build, matches repo names
   IMAGE_REGISTRY: 'ghcr.io/${{ github.repository_owner }}' # do not edit
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-${{ inputs.brand_name}}-${{ inputs.stream_name }}
+  group: ${{ inputs.image_name }}
   cancel-in-progress: true
 
 jobs:
@@ -73,18 +72,45 @@ jobs:
 
           echo "alias_tags=${alias_tags[*]}" >> $GITHUB_OUTPUT
 
+      # loosely based on https://github.com/bsherman/ublue-custom/blob/a52f917fdf54f24a92f03cdd44d727ae0e15eff4/.github/workflows/reusable-build.yml#L87
+      - name: Get Upstream Version
+        id: version
+        shell: bash
+        run: |
+          set -euxo pipefail
+          IMAGE=$(cat ./images/${{ inputs.image_name }}.Containerfile | grep '^FROM ' | tail -n1 | sed -E 's/FROM (.*)( .*)?/\1/')
+          KERNEL_RELEASE=$(skopeo inspect docker://${IMAGE} | jq -r '.Labels["ostree.linux"]')
+          fedora_version=$(echo $KERNEL_RELEASE | grep -oP 'fc\K[0-9]+')
+          echo "kernel_release=$KERNEL_RELEASE" >> $GITHUB_OUTPUT
+          echo "fedora_version=$fedora_version" >> $GITHUB_OUTPUT
+          ver=$(skopeo inspect docker://$IMAGE | jq -r '.Labels["org.opencontainers.image.version"]')
+          if [ -z "$ver" ] || [ "null" = "$ver" ]; then
+          echo "inspected image version must not be empty or null"
+          exit 1
+          fi
+          echo "VERSION=$ver" >> $GITHUB_OUTPUT
+
+      # Get timestamp for image creation
+      - name: Get timestamp
+        id: timestamp
+        run: |
+          echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
       # Build metadata
       - name: Image Metadata
         uses: docker/metadata-action@v5
         id: meta
         with:
-          images: |
-            ${{ env.MY_IMAGE_NAME }}
-
+          images: ${{ env.IMAGE_NAME }}
           labels: |
-            io.artifacthub.package.readme-url=https://raw.githubusercontent.com/${{ github.repository }}/main/README.md
-            org.opencontainers.image.description=${{ env.MY_IMAGE_DESC }}
-            org.opencontainers.image.title=${{ env.MY_IMAGE_NAME }}
+            org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+            org.opencontainers.image.description=Custom image based on universal-blue
+            org.opencontainers.image.created=${{ steps.timestamp.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=https://github.com/nzbr/ublue/blob/main/images/${{ inputs.image_name }}.Containerfile
+            org.opencontainers.image.vendor=nzbr
+            org.opencontainers.image.version=${{ steps.version.outputs.VERSION }}
+            org.universal-blue.pkg.kernel=${{ steps.version.outputs.kernel_release }}
 
       # Build image using Buildah action
       - name: Build Image
@@ -95,7 +121,7 @@ jobs:
             ./images/${{ inputs.image_name }}.Containerfile
           # Postfix image name with -custom to make it a little more descriptive
           # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
-          image: ${{ env.MY_IMAGE_NAME }}
+          image: ${{ env.IMAGE_NAME }}
           tags: |
             ${{ steps.generate-tags.outputs.alias_tags }}
           labels: ${{ steps.meta.outputs.labels }}
