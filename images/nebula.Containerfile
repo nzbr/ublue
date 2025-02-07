@@ -2,9 +2,9 @@ FROM ghcr.io/ublue-os/fedora-toolbox:latest AS build
 
 # Run build scripts
 RUN --mount=type=bind,source=./scripts,target=/scripts,z \
-    mkdir -p /build && \
-    /scripts/kwin-effects-forceblur/build.sh && \
-    /scripts/kde-rounded-corners/build.sh
+    mkdir -p /build \
+    && /scripts/kwin-effects-forceblur/build.sh \
+    && /scripts/kde-rounded-corners/build.sh
 
 
 FROM ghcr.io/ublue-os/aurora-dx:stable
@@ -38,4 +38,9 @@ RUN --mount=type=bind,source=./scripts,target=/scripts,z \
 RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     --mount=type=bind,from=build,source=/build,target=/build,z \
     /scripts/tweak-rpm-ostree/install.sh && \
+    ostree container commit
+
+RUN --mount=type=bind,source=./scripts,target=/scripts,z \
+    --mount=type=bind,from=build,source=/build,target=/build,z \
+    /scripts/koi/install.sh && \
     ostree container commit
