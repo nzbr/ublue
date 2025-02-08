@@ -1,0 +1,7 @@
+name: yin-yang
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - libsystemd=257
+  - pkg-config=0.29.2

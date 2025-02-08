@@ -4,7 +4,8 @@ FROM ghcr.io/ublue-os/fedora-toolbox:latest AS build
 RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     mkdir -p /build \
     && /scripts/kwin-effects-forceblur/build.sh \
-    && /scripts/kde-rounded-corners/build.sh
+    && /scripts/kde-rounded-corners/build.sh \
+    && /scripts/yin-yang/build.sh
 
 
 FROM ghcr.io/ublue-os/aurora-dx:stable
@@ -42,5 +43,5 @@ RUN --mount=type=bind,source=./scripts,target=/scripts,z \
 
 RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     --mount=type=bind,from=build,source=/build,target=/build,z \
-    /scripts/koi/install.sh && \
+    /scripts/yin-yang/install.sh && \
     ostree container commit
