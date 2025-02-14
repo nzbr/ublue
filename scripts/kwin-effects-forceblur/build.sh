@@ -41,7 +41,8 @@ mkdir -p $builddir
 cd $builddir
 
 # TODO: Update with renovate
-git clone --depth 1 --branch v1.3.4 https://github.com/taj-ny/kwin-effects-forceblur.git
+# git clone --depth 1 --branch v1.3.4 https://github.com/taj-ny/kwin-effects-forceblur.git
+git clone --depth 1 https://github.com/taj-ny/kwin-effects-forceblur.git
 cd kwin-effects-forceblur
 
 mkdir build && cd build
