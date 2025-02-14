@@ -8,7 +8,7 @@ RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     && /scripts/yin-yang/build.sh
 
 
-FROM ghcr.io/ublue-os/aurora-dx:stable
+FROM ghcr.io/ublue-os/aurora-dx:latest
 
 RUN mkdir -p /var/lib/alternatives && ostree container commit
 ## NOTES:
