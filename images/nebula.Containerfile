@@ -45,3 +45,8 @@ RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     --mount=type=bind,from=build,source=/build,target=/build,z \
     /scripts/yin-yang/install.sh && \
     ostree container commit
+
+RUN --mount=type=bind,source=./scripts,target=/scripts,z \
+    --mount=type=bind,from=build,source=/build,target=/build,z \
+    /scripts/kde-darkly/install.sh && \
+    ostree container commit
