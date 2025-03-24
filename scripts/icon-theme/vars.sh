@@ -1,0 +1,1 @@
+builddir=/build/icon-theme
