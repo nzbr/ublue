@@ -1,14 +1,14 @@
 FROM ghcr.io/ublue-os/fedora-toolbox:latest AS build
 
-# Run build scripts
-RUN --mount=type=bind,source=./scripts,target=/scripts,z \
-    mkdir -p /build \
-    && /scripts/kwin-effects-forceblur/build.sh \
-    && /scripts/kde-rounded-corners/build.sh \
-    && /scripts/yin-yang/build.sh
+# # Run build scripts
+# RUN --mount=type=bind,source=./scripts,target=/scripts,z \
+#     mkdir -p /build \
+#     && /scripts/kwin-effects-forceblur/build.sh \
+#     && /scripts/kde-rounded-corners/build.sh \
+#     && /scripts/yin-yang/build.sh
 
 
-FROM ghcr.io/ublue-os/aurora-dx:latest
+FROM ghcr.io/ublue-os/bluefin-dx:latest
 
 RUN mkdir -p /var/lib/alternatives && ostree container commit
 ## NOTES:
@@ -26,27 +26,27 @@ RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     /scripts/razer-nari-pulseaudio-profile/install.sh && \
     ostree container commit
 
-RUN --mount=type=bind,source=./scripts,target=/scripts,z \
-    --mount=type=bind,from=build,source=/build,target=/build,z \
-    /scripts/kwin-effects-forceblur/install.sh && \
-    ostree container commit
+# RUN --mount=type=bind,source=./scripts,target=/scripts,z \
+#     --mount=type=bind,from=build,source=/build,target=/build,z \
+#     /scripts/kwin-effects-forceblur/install.sh && \
+#     ostree container commit
 
-RUN --mount=type=bind,source=./scripts,target=/scripts,z \
-    --mount=type=bind,from=build,source=/build,target=/build,z \
-    /scripts/kde-rounded-corners/install.sh && \
-    ostree container commit
+# RUN --mount=type=bind,source=./scripts,target=/scripts,z \
+#     --mount=type=bind,from=build,source=/build,target=/build,z \
+#     /scripts/kde-rounded-corners/install.sh && \
+#     ostree container commit
 
 RUN --mount=type=bind,source=./scripts,target=/scripts,z \
     --mount=type=bind,from=build,source=/build,target=/build,z \
     /scripts/tweak-rpm-ostree/install.sh && \
     ostree container commit
 
-RUN --mount=type=bind,source=./scripts,target=/scripts,z \
-    --mount=type=bind,from=build,source=/build,target=/build,z \
-    /scripts/yin-yang/install.sh && \
-    ostree container commit
+# RUN --mount=type=bind,source=./scripts,target=/scripts,z \
+#     --mount=type=bind,from=build,source=/build,target=/build,z \
+#     /scripts/yin-yang/install.sh && \
+#     ostree container commit
 
-RUN --mount=type=bind,source=./scripts,target=/scripts,z \
-    --mount=type=bind,from=build,source=/build,target=/build,z \
-    /scripts/kde-darkly/install.sh && \
-    ostree container commit
+# RUN --mount=type=bind,source=./scripts,target=/scripts,z \
+#     --mount=type=bind,from=build,source=/build,target=/build,z \
+#     /scripts/kde-darkly/install.sh && \
+#     ostree container commit
