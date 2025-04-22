@@ -9,7 +9,8 @@ elif [ -f /usr/bin/gnome-software ]; then
     rpm-ostree install gnome-software-rpm-ostree
 fi
 
-systemctl disable ublue-update.timer
+# Disable universal-blue update, use rpm-ostreed-automatic instead
+systemctl disable uupd.timer
 systemctl enable rpm-ostreed-automatic.timer
 
 cat <<EOF >/etc/rpm-ostreed.conf
