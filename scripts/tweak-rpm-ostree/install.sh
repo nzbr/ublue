@@ -2,7 +2,12 @@
 
 set -euxo pipefail
 
-rpm-ostree install plasma-discover-rpm-ostree
+if [ -f /usr/bin/plasma-discover ]; then
+    rpm-ostree install plasma-discover-rpm-ostree
+elif [ -f /usr/bin/gnome-software ]; then
+    rpm-ostree uninstall gnome-software # Uninstall the incompatible ublue-patched version first
+    rpm-ostree install gnome-software-rpm-ostree
+fi
 
 systemctl disable ublue-update.timer
 systemctl enable rpm-ostreed-automatic.timer
@@ -19,7 +24,7 @@ AutomaticUpdatePolicy=check
 # NOTE: This will be set to true by default in Spring 2025
 #
 # Set this to false to enable local layering with dnf
-# This is an unsupported configuration that can lead to upgrade isses
+# This is an unsupported configuration that can lead to upgrade issues
 # Be careful when setting this to true
 #
 # See [future link] for more information
@@ -37,3 +42,5 @@ polkit.addRule(function(action, subject) {
     }
 });
 EOF
+
+# TODO: Enforce image signatures through /etc/containers/policy.json
