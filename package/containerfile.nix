@@ -75,7 +75,7 @@ let
               WORKDIR ${buildDir}
               RUN ${concatStringsSep " && " [
                 "echo -e '\\n\\e[36m>>> Building ${layer.name} <<<\\e[0m'"
-                "echo ${toBase64 (builtins.unsafeDiscardStringContext layer.build)} | base64 -d | bash -ex -"
+                "bash -ex ${buildScript}"
                 "echo ''"
               ]}
             ''
