@@ -1,7 +1,7 @@
 { layers, ... }:
 {
   name = "nebula";
-  from = "ghcr.io/nzbr/bluefin-dx:latest";
+  from = "ghcr.io/nzbr/ublue-bluefin-dx:latest";
   layers = with layers; [
     onepassword
     razer-nari-pulseaudio-profile
