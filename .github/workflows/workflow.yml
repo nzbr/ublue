@@ -12,11 +12,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        image:
-          - nebula
+  build-containerfiles:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build containerfiles
+        run: |
+          FILES=$(nix eval --json .#ublueImages.x86_64-linux | jq -r keys.[] | sed -E 's|^(.*)$|.#ublueImages.x86_64-linux.\1|' | xargs nix build --json --no-link | jq -r '.[].outputs.out')
+          mkdir -p containerfiles
+          cp -v $FILES containerfiles/
+
+      - name: Upload containerfiles
+        uses: actions/upload-artifact@v4
+        with:
+          name: containerfiles
+          path: containerfiles
+
+  bluefin-dx:
+    needs: build-containerfiles
 
     permissions:
       contents: read
@@ -26,4 +47,16 @@ jobs:
 
     uses: ./.github/workflows/build-image.yml
     with:
-      image_name: ${{ matrix.image }}
+      image_name: bluefin-dx
+  nebula:
+    needs: bluefin-dx
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    secrets: inherit
+
+    uses: ./.github/workflows/build-image.yml
+    with:
+      image_name: nebula

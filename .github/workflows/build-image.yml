@@ -26,8 +26,14 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout Push to Registry action
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download containerfiles
+        uses: actions/download-artifact@v4
+        with:
+          name: containerfiles
+          path: containerfiles
 
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v8
@@ -78,7 +84,7 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          IMAGE=$(cat ./images/${{ inputs.image_name }}.Containerfile | grep '^FROM ' | tail -n1 | sed -E 's/FROM (.*)( .*)?/\1/')
+          IMAGE=$(cat ./containerfiles/*-${{ inputs.image_name }}.Containerfile | grep '^FROM ' | tail -n1 | sed -E 's/FROM (.*)( .*)?/\1/')
           KERNEL_RELEASE=$(skopeo inspect docker://${IMAGE} | jq -r '.Labels["ostree.linux"]')
           fedora_version=$(echo $KERNEL_RELEASE | grep -oP 'fc\K[0-9]+')
           echo "kernel_release=$KERNEL_RELEASE" >> $GITHUB_OUTPUT
@@ -107,10 +113,15 @@ jobs:
             org.opencontainers.image.description=Custom image based on universal-blue
             org.opencontainers.image.created=${{ steps.timestamp.outputs.created }}
             org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.source=https://github.com/nzbr/ublue/blob/main/images/${{ inputs.image_name }}.Containerfile
+            org.opencontainers.image.source=https://github.com/nzbr/ublue/blob/main/images/${{ inputs.image_name }}.nix
             org.opencontainers.image.vendor=nzbr
             org.opencontainers.image.version=${{ steps.version.outputs.VERSION }}
             org.universal-blue.pkg.kernel=${{ steps.version.outputs.kernel_release }}
+
+      - name: Get image file name
+        id: containerfile
+        run: |
+          echo "containerfile=$(echo ./containerfiles/*-${{ inputs.image_name }}.Containerfile)" >> $GITHUB_OUTPUT
 
       # Build image using Buildah action
       - name: Build Image
@@ -118,7 +129,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           containerfiles: |
-            ./images/${{ inputs.image_name }}.Containerfile
+            ${{ steps.containerfile.outputs.containerfile }}
           # Postfix image name with -custom to make it a little more descriptive
           # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
           image: ${{ env.IMAGE_NAME }}

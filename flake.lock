@@ -1,0 +1,111 @@
+{
+  "nodes": {
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": "nixpkgs-lib"
+      },
+      "locked": {
+        "lastModified": 1733312601,
+        "narHash": "sha256-4pDvzqnegAfRkPwO3wmwBhVi/Sye1mzps0zHWYnP88c=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "205b12d8b7cd4802fbcb8e8ef6a0f1408781a4f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "nix-basement": {
+      "inputs": {
+        "flake-parts": "flake-parts",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1744421721,
+        "narHash": "sha256-4OgW+8T2nkr5GRt2QVRPlwofbvX2bC8pPS6qpLtRqbI=",
+        "owner": "nix-prefab",
+        "repo": "nix-basement",
+        "rev": "fc57a830d5491b8ab57dfa849590bb82f41d572a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-prefab",
+        "ref": "flake-part-stories",
+        "repo": "nix-basement",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1735264675,
+        "narHash": "sha256-MgdXpeX2GuJbtlBrH9EdsUeWl/yXEubyvxM1G+yO4Ak=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "d49da4c08359e3c39c4e27c74ac7ac9b70085966",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-24.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-lib": {
+      "locked": {
+        "lastModified": 1733096140,
+        "narHash": "sha256-1qRH7uAUsyQI7R1Uwl4T+XvdNv778H0Nb5njNrqvylY=",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/5487e69da40cbd611ab2cadee0b4637225f7cfae.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/5487e69da40cbd611ab2cadee0b4637225f7cfae.tar.gz"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1746328495,
+        "narHash": "sha256-uKCfuDs7ZM3QpCE/jnfubTg459CnKnJG/LwqEVEdEiw=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "979daf34c8cacebcd917d540070b52a3c2b9b16e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "razer-nari-pulseaudio-profile": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1651306113,
+        "narHash": "sha256-ZxdTRxBIodewAqflYFfpB5fYlyWqStvBxSovyA+LIEk=",
+        "owner": "imustafin",
+        "repo": "razer-nari-pulseaudio-profile",
+        "rev": "6b632edfb0b51fc7a3227b8f5b6c3a8c4616661e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "imustafin",
+        "repo": "razer-nari-pulseaudio-profile",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nix-basement": "nix-basement",
+        "nixpkgs": "nixpkgs_2",
+        "razer-nari-pulseaudio-profile": "razer-nari-pulseaudio-profile"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

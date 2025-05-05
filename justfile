@@ -1,5 +1,2 @@
-nebula:
-    buildah build --layers -t local:ublue-nebula --file images/nebula.Containerfile .
-
-nebula-build:
-    buildah build --layers -t local:ublue-nebula-build --file images/nebula.Containerfile --target build .
+nebula-nix:
+    if command -v nom >/dev/null; then nom build .#ublueImages.x86_64-linux.nebula; else nix build -vL .#ublueImages.x86_64-linux.nebula; fi && buildah build --layers -t local:test --file `readlink result` .
