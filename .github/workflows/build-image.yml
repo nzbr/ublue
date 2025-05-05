@@ -6,6 +6,10 @@ on:
       image_name:
         type: string
         required: true
+      cleanup_runner:
+        type: boolean
+        required: false
+        default: false
 
 env:
   IMAGE_NAME: '${{ github.event.repository.name }}-${{ inputs.image_name }}' # the name of the image produced by this build, matches repo names
@@ -36,6 +40,7 @@ jobs:
           path: containerfiles
 
       - name: Maximize build space
+        if: ${{ inputs.cleanup_runner }}
         uses: ublue-os/remove-unwanted-software@v8
 
       - name: Generate tags
