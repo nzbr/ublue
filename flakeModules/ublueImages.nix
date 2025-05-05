@@ -30,7 +30,8 @@ in
         let
           layerModules = mapAttrs' (n: v: { name = removeSuffix "/default" n; value = v; }) (findModules "${root}/layers");
         in
-        mapAttrs (n: v: pkgs.callPackage v { inherit inputs; inherit lib; }) layerModules;
+        # Passing pkgs should not be necessary, but somehow it doesn't work without it
+        mapAttrs (n: v: pkgs.callPackage v (pkgs // { inherit inputs; inherit lib; })) layerModules;
 
       ublueImages =
         let
