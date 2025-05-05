@@ -16,7 +16,7 @@ env:
   IMAGE_REGISTRY: 'ghcr.io/${{ github.repository_owner }}' # do not edit
 
 concurrency:
-  group: ${{ inputs.image_name }}
+  group: ${{ inputs.image_name }}-${{ github.ref}}
   cancel-in-progress: true
 
 jobs:
