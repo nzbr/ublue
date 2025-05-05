@@ -22,4 +22,7 @@ RUN mkdir -p /build/tweak-rpm-ostree && cd /build/tweak-rpm-ostree && /scripts/t
 COPY scripts/nix-mountpoint /scripts/nix-mountpoint
 RUN mkdir -p /build/nix-mountpoint && cd /build/nix-mountpoint && /scripts/nix-mountpoint/install.sh && ostree container commit
 
+COPY scripts/no-flatpak-auto-update /scripts/no-flatpak-auto-update
+RUN mkdir -p /build/no-flatpak-auto-update && cd /build/no-flatpak-auto-update && /scripts/no-flatpak-auto-update/install.sh && ostree container commit
+
 RUN rm -rf /scripts /build && ostree container commit
