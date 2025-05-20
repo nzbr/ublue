@@ -7,9 +7,6 @@
 
     if [ -f /usr/bin/plasma-discover ]; then
         rpm-ostree install plasma-discover-rpm-ostree
-    elif [ -f /usr/bin/gnome-software ]; then
-        rpm-ostree uninstall gnome-software # Uninstall the incompatible ublue-patched version first
-        rpm-ostree install gnome-software-rpm-ostree
     fi
 
     # Disable universal-blue update, use rpm-ostreed-automatic instead
