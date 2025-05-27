@@ -38,7 +38,7 @@ in
           configs = findModules "${root}/images";
           configs' = mapAttrs (n: v: pkgs.callPackage v { layers = config.ublueLayers; }) configs;
         in
-        mapAttrs (n: v: pkgs.callPackage ../package/containerfile.nix { imageConfig = v; inherit lib; }) configs';
+        mapAttrs (n: v: pkgs.callPackage ../package/generateContainerfile.nix { imageConfig = v; inherit lib; }) configs';
     };
   };
 }

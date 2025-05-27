@@ -5,5 +5,6 @@
   layers = with layers; [
     onepassword
     ecryptfs
+    motorcomm-yt6801
   ];
 }

@@ -138,7 +138,8 @@
         "nix-basement": "nix-basement",
         "nixpkgs": "nixpkgs_2",
         "razer-nari-pulseaudio-profile": "razer-nari-pulseaudio-profile",
-        "yin-yang": "yin-yang"
+        "yin-yang": "yin-yang",
+        "yt6801": "yt6801"
       }
     },
     "yin-yang": {
@@ -156,6 +157,22 @@
         "ref": "v3.4",
         "repo": "Yin-Yang",
         "type": "github"
+      }
+    },
+    "yt6801": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1743625814,
+        "narHash": "sha256-q8SrrNwXAol0z9T4jVBhhn3G6ABQlEHII/QFTWDKlWo=",
+        "ref": "refs/heads/main",
+        "rev": "39a3bd4b92e1be8d1e03b331b46cdcf1d65048db",
+        "revCount": 31,
+        "type": "git",
+        "url": "https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git"
       }
     }
   },
