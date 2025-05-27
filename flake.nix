@@ -21,6 +21,10 @@
       url = "github:oskarsh/Yin-Yang/v3.4";
       flake = false;
     };
+    yt6801 = {
+      url = "git+https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git";
+      flake = false;
+    };
   };
 
   outputs = inputs: inputs.nix-basement.lib.constructFlake
@@ -31,7 +35,11 @@
       systems = [ "x86_64-linux" ];
 
       perSystem = { pkgs, ... }: {
-        shell.packages = [ pkgs.nix-output-monitor ];
+        shell.packages = [
+          pkgs.nix-output-monitor
+          pkgs.rage
+          pkgs.ragenix
+        ];
       };
     }
   );

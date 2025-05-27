@@ -132,16 +132,19 @@ jobs:
       - name: Build Image
         id: build_image
         uses: redhat-actions/buildah-build@v2
+        env:
+          AGE_KEY: ${{ secrets.AGE_KEY }}
         with:
           containerfiles: |
             ${{ steps.containerfile.outputs.containerfile }}
-          # Postfix image name with -custom to make it a little more descriptive
-          # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
           image: ${{ env.IMAGE_NAME }}
           tags: |
             ${{ steps.generate-tags.outputs.alias_tags }}
           labels: ${{ steps.meta.outputs.labels }}
           oci: false
+          extra-args: |
+            --secret
+            id=key,env=AGE_KEY
 
       # Workaround bug where capital letters in your GitHub username make it impossible to push to GHCR.
       # https://github.com/macbre/push-to-ghcr/issues/12
