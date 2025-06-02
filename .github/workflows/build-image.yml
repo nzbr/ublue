@@ -122,6 +122,8 @@ jobs:
             org.opencontainers.image.version=${{ steps.version.outputs.VERSION }}
             org.universal-blue.pkg.kernel=${{ steps.version.outputs.kernel_release }}
           tags: ${{ steps.generate-tags.outputs.alias_tags }}
+          flavor: |
+            latest=${{ github.event_name != 'pull_request' && 'true' || 'false' }}
 
       - name: Get image file name
         id: containerfile
