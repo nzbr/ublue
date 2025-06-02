@@ -140,4 +140,6 @@ writeText "${imageConfig.name}.Containerfile" ''
   FROM ${imageConfig.from}
 
   ${concatStringsSep "\n" installCommands}
+
+  CMD ["/bin/sh", "-c", "mkdir /var/roothome && exec /usr/bin/bash --login"]
 ''

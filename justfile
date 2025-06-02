@@ -11,6 +11,11 @@ build host:
     mkdir -p "$CTX"
     docker buildx build --debug -t ghcr.io/nzbr/ublue-{{host}}:latest --secret id=key,src=$HOME/.ssh/id_ed25519 --file `readlink result` "$CTX"
 
+shell host:
+    #!/usr/bin/env bash
+    set -ex
+    docker run --rm -it ghcr.io/nzbr/ublue-{{host}}:latest
+
 aurora-dx: (build "aurora-dx")
 bluefin-dx: (build "bluefin-dx")
 nebula: bluefin-dx (build "nebula")
