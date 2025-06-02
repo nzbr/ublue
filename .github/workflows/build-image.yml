@@ -138,6 +138,13 @@ jobs:
           CTX=$(mktemp -d)
           echo "context=${CTX}" >> $GITHUB_OUTPUT
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
       # Build image using docker buildx
       - name: Build Image
         id: build_image
@@ -153,13 +160,6 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
 
       # Sign container
       - uses: sigstore/cosign-installer@v3.8.2
