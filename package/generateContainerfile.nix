@@ -22,7 +22,7 @@ let
     ;
 
   getSafeName =
-    layer: if layer.name or "" == "" then "anonymous" else strings.sanitizeDerivationName layer.name;
+    layer: if layer.name or "" == "" then "anonymous" else (strings.toLower (strings.sanitizeDerivationName layer.name));
 
   getBuildDir = layer: "/run/build/${getSafeName layer}";
 
@@ -76,7 +76,7 @@ let
           name = "${layer.name}-serialized-nix-closure";
 
           buildCommand = ''
-            base64 -w 100000 ${closureArchive} > $out
+            base64 -w 65000 ${closureArchive} > $out
             sed -i -E 's|^(.*)$|RUN echo \1 >> ${buildDir}/nix-closure.tar.xz.b64|' $out
           '';
         };

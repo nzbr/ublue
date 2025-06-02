@@ -1,6 +1,6 @@
 { ... }:
 {
-  name = "1password";
+  name = "onepassword";
 
   build = ''
     cp ${./1password.repo} ./1password.repo

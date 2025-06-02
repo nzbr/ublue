@@ -112,7 +112,7 @@ jobs:
         uses: docker/metadata-action@v5
         id: meta
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
           labels: |
             org.opencontainers.image.title=${{ env.IMAGE_NAME }}
             org.opencontainers.image.description=Custom image based on universal-blue
@@ -122,64 +122,39 @@ jobs:
             org.opencontainers.image.vendor=nzbr
             org.opencontainers.image.version=${{ steps.version.outputs.VERSION }}
             org.universal-blue.pkg.kernel=${{ steps.version.outputs.kernel_release }}
+          tags: ${{ steps.generate-tags.outputs.alias_tags }}
 
       - name: Get image file name
         id: containerfile
         run: |
           echo "containerfile=$(echo ./containerfiles/*-${{ inputs.image_name }}.Containerfile)" >> $GITHUB_OUTPUT
 
-      # Build image using Buildah action
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build image using docker buildx
       - name: Build Image
         id: build_image
-        uses: redhat-actions/buildah-build@v2
-        env:
-          AGE_KEY: ${{ secrets.AGE_KEY }}
+        uses: docker/build-push-action@v6
         with:
-          containerfiles: |
-            ${{ steps.containerfile.outputs.containerfile }}
-          image: ${{ env.IMAGE_NAME }}
-          tags: |
-            ${{ steps.generate-tags.outputs.alias_tags }}
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          file: ${{ steps.containerfile.outputs.containerfile }}
+          secrets: |
+            "key=${{ secrets.AGE_KEY }}"
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          oci: false
-          extra-args: |
-            --secret
-            id=key,env=AGE_KEY
-
-      # Workaround bug where capital letters in your GitHub username make it impossible to push to GHCR.
-      # https://github.com/macbre/push-to-ghcr/issues/12
-      - name: Lowercase Registry
-        id: registry_case
-        uses: ASzc/change-string-case-action@v6
-        with:
-          string: ${{ env.IMAGE_REGISTRY }}
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push Image to GHCR
-        uses: redhat-actions/push-to-registry@v2
-        id: push
-        env:
-          REGISTRY_USER: ${{ github.actor }}
-          REGISTRY_PASSWORD: ${{ github.token }}
-        with:
-          image: ${{ steps.build_image.outputs.image }}
-          tags: ${{ steps.build_image.outputs.tags }}
-          registry: ${{ steps.registry_case.outputs.lowercase }}
-          username: ${{ env.REGISTRY_USER }}
-          password: ${{ env.REGISTRY_PASSWORD }}
-          extra-args: |
-            --compression-format=zstd
-
-      # This section is optional and only needs to be enabled if you plan on distributing
-      # your project for others to consume. You will need to create a public and private key
-      # using Cosign and save the private key as a repository secret in Github for this workflow
-      # to consume. For more details, review the image signing section of the README.
+          password: ${{ github.token }}
 
       # Sign container
       - uses: sigstore/cosign-installer@v3.8.2
@@ -188,8 +163,8 @@ jobs:
       - name: Sign container image
         if: github.event_name != 'pull_request'
         run: |
-          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ steps.registry_case.outputs.lowercase }}/${{ steps.build_image.outputs.image }}@${TAGS}
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}@${TAGS}
         env:
-          TAGS: ${{ steps.push.outputs.digest }}
+          TAGS: ${{ steps.build_image.outputs.digest }}
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
