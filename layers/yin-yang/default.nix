@@ -36,7 +36,7 @@ in
     #!/usr/bin/env bash
     cd /usr/lib/yin-yang/ || exit 1
     export PATH=${venv}/bin:\\$PATH
-    exec python -Om yin_yang "\\$@"
+    exec python -Om yin_yang "\$@"
     EOF
     chmod 0755 /usr/bin/yin-yang
 
