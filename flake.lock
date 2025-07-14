@@ -18,23 +18,6 @@
         "type": "github"
       }
     },
-    "kde-rounded-corners": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1719463925,
-        "narHash": "sha256-xzs5eTNOO27//vfkax4cpKO3xnsjavSNU6tyt8H/dF0=",
-        "owner": "matinlotfali",
-        "repo": "KDE-Rounded-Corners",
-        "rev": "d9fea2e41a27995f86fba334f06ecac4b798df63",
-        "type": "github"
-      },
-      "original": {
-        "owner": "matinlotfali",
-        "ref": "v0.6.7",
-        "repo": "KDE-Rounded-Corners",
-        "type": "github"
-      }
-    },
     "kwin-effects-forceblur": {
       "flake": false,
       "locked": {
@@ -119,7 +102,6 @@
     },
     "root": {
       "inputs": {
-        "kde-rounded-corners": "kde-rounded-corners",
         "kwin-effects-forceblur": "kwin-effects-forceblur",
         "nix-basement": "nix-basement",
         "nixpkgs": "nixpkgs",
