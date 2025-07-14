@@ -6,8 +6,8 @@
     rpm-ostree-tweaks
     nix-mountpoint
     kde-darkly
-    kwin-effects-forceblur
     kde-rounded-corners
+    kwin-effects-forceblur
     yin-yang
   ];
 }

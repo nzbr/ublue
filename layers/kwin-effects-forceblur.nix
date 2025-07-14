@@ -3,38 +3,36 @@
   name = "KWin Effects Forceblur";
 
   build = ''
+    kf6_ver=$(rpm -q --qf '%{VERSION}' kf6-kconfigwidgets)
+
     rpm-ostree install \
       cmake \
-      extra-cmake-modules \
+      extra-cmake-modules-''${kf6_ver} \
       gcc-g++ \
-      kf6-kwindowsystem-devel \
-      plasma-workspace-devel \
-      libplasma-devel \
-      qt6-qtbase-private-devel \
-      qt6-qtbase-devel \
-      cmake \
-      kwin-devel \
-      extra-cmake-modules \
-      kwin-devel \
-      kf6-knotifications-devel \
-      kf6-kio-devel \
-      kf6-kcrash-devel \
-      kf6-ki18n-devel \
-      kf6-kguiaddons-devel \
-      libepoxy-devel \
-      kf6-kglobalaccel-devel \
-      kf6-kcmutils-devel \
-      kf6-kconfigwidgets-devel \
-      kf6-kdeclarative-devel \
-      kdecoration-devel \
-      kf6-kglobalaccel \
-      kf6-kdeclarative \
-      libplasma \
-      kf6-kio \
-      qt6-qtbase \
-      kf6-kguiaddons \
-      kf6-ki18n \
-      wayland-devel
+      kdecoration-devel-$(rpm -q --qf '%{VERSION}' kdecoration) \
+      kf6-kcmutils-devel-''${kf6_ver} \
+      kf6-kconfigwidgets-devel-''${kf6_ver} \
+      kf6-kcrash-devel-''${kf6_ver} \
+      kf6-kdeclarative-''${kf6_ver} \
+      kf6-kdeclarative-devel-''${kf6_ver} \
+      kf6-kglobalaccel-''${kf6_ver} \
+      kf6-kglobalaccel-devel-''${kf6_ver} \
+      kf6-kguiaddons-''${kf6_ver} \
+      kf6-kguiaddons-devel-''${kf6_ver} \
+      kf6-ki18n-''${kf6_ver} \
+      kf6-ki18n-devel-''${kf6_ver} \
+      kf6-kio-''${kf6_ver} \
+      kf6-kio-devel-''${kf6_ver} \
+      kf6-knotifications-devel-''${kf6_ver} \
+      kf6-kwindowsystem-devel-''${kf6_ver} \
+      kwin-devel-$(rpm -q --qf '%{VERSION}' kwin) \
+      libdrm-devel-$(rpm -q --qf '%{VERSION}' libdrm) \
+      libepoxy-devel-$(rpm -q --qf '%{VERSION}' libepoxy) \
+      libplasma-devel-$(rpm -q --qf '%{VERSION}' libplasma) \
+      plasma-workspace-devel-$(rpm -q --qf '%{VERSION}' plasma-workspace) \
+      qt6-qtbase-devel-$(rpm -q --qf '%{VERSION}' qt6-qtbase) \
+      qt6-qtbase-private-devel-$(rpm -q --qf '%{VERSION}' qt6-qtbase) \
+      wayland-devel-$(rpm -q --qf '%{VERSION}' libwayland-client)
 
       cp -vr ${inputs.kwin-effects-forceblur}/. ./
 
