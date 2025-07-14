@@ -5,7 +5,6 @@
   layers = with layers; [
     razer-nari-pulseaudio-profile
     rpm-ostree-tweaks
-    no-flatpak-auto-update
     nix-mountpoint
     kde-darkly
     kwin-effects-forceblur
