@@ -22,8 +22,8 @@ in
     ln -s ${secretPath ../secrets/mok.pub} /var/lib/dkms/mok.pub
     ln -s ${secretPath ../secrets/mok.key.age} /var/lib/dkms/mok.key
 
-    MODULE_NAME=$(cat "${inputs.yt6801}/tuxedo-yt6801.spec" | sed -n 's/Name: *//p')
-    MODULE_VERSION=$(cat "${inputs.yt6801}/tuxedo-yt6801.spec" | sed -n 's/Version: *//p')
+    MODULE_NAME=$(grep -Pom1 '.*(?= \(.*\) .*; urgency=.*)' ${inputs.yt6801}/debian/changelog)
+    MODULE_VERSION=$(grep -Pom1 '.* \(\K.*(?=\) .*; urgency=.*)' ${inputs.yt6801}/debian/changelog)
     KERNEL_VERSION=${kernelVersion}
     DKMS_DIR="/usr/src/''${MODULE_NAME}-''${MODULE_VERSION}"
 
