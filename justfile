@@ -18,4 +18,4 @@ shell host:
 
 aurora-dx: (build "aurora-dx")
 bluefin-dx: (build "bluefin-dx")
-nebula: bluefin-dx (build "nebula")
+nebula: aurora-dx (build "nebula")

@@ -1,7 +1,7 @@
 { layers, ... }:
 {
   name = "nebula";
-  from = "ghcr.io/nzbr/ublue-bluefin-dx:latest";
+  from = "ghcr.io/nzbr/ublue-aurora-dx:latest";
   layers = with layers; [
     onepassword
     ecryptfs

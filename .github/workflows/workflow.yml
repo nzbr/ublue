@@ -63,7 +63,7 @@ jobs:
       image_name: aurora-dx
 
   nebula:
-    needs: bluefin-dx
+    needs: aurora-dx
 
     permissions:
       contents: read
