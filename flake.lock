@@ -21,11 +21,11 @@
     "kwin-effects-forceblur": {
       "flake": false,
       "locked": {
-        "lastModified": 1745057346,
-        "narHash": "sha256-71cyYKUul9owRzbcObXkzhTBcmnXJsvmk1gq0RbP5PQ=",
+        "lastModified": 1751809810,
+        "narHash": "sha256-DNI/IxfFRNDrGPdpwsEsmXCYFeKdRDRKDLcDimZWrVE=",
         "owner": "taj-ny",
         "repo": "kwin-effects-forceblur",
-        "rev": "fea9f80f27389aa8a62befb5babf40b28fed328d",
+        "rev": "26ea1b6830143b15dba114fce754f6253e9eb5a5",
         "type": "github"
       },
       "original": {
