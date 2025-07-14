@@ -84,28 +84,11 @@
         "url": "https://github.com/NixOS/nixpkgs/archive/5487e69da40cbd611ab2cadee0b4637225f7cfae.tar.gz"
       }
     },
-    "razer-nari-pulseaudio-profile": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1651306113,
-        "narHash": "sha256-ZxdTRxBIodewAqflYFfpB5fYlyWqStvBxSovyA+LIEk=",
-        "owner": "imustafin",
-        "repo": "razer-nari-pulseaudio-profile",
-        "rev": "6b632edfb0b51fc7a3227b8f5b6c3a8c4616661e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "imustafin",
-        "repo": "razer-nari-pulseaudio-profile",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "kwin-effects-forceblur": "kwin-effects-forceblur",
         "nix-basement": "nix-basement",
         "nixpkgs": "nixpkgs",
-        "razer-nari-pulseaudio-profile": "razer-nari-pulseaudio-profile",
         "yin-yang": "yin-yang",
         "yt6801": "yt6801"
       }

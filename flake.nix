@@ -8,10 +8,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    razer-nari-pulseaudio-profile = {
-      url = "github:imustafin/razer-nari-pulseaudio-profile";
-      flake = false;
-    };
     kwin-effects-forceblur = {
       url = "github:taj-ny/kwin-effects-forceblur";
       flake = false;
