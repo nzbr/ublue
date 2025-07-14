@@ -32,18 +32,19 @@
       plasma-workspace-devel-$(rpm -q --qf '%{VERSION}' plasma-workspace) \
       qt6-qtbase-devel-$(rpm -q --qf '%{VERSION}' qt6-qtbase) \
       qt6-qtbase-private-devel-$(rpm -q --qf '%{VERSION}' qt6-qtbase) \
+      rpm-build \
       wayland-devel-$(rpm -q --qf '%{VERSION}' libwayland-client)
 
       cp -vr ${inputs.kwin-effects-forceblur}/. ./
 
       cmake -B build -S . -D CMAKE_INSTALL_PREFIX=/usr
       cmake --build build -j$(nproc)
+
+      cd build
+      cpack -V -G RPM
   '';
 
   install = ''
-    cd build
-    mkdir -p /usr/lib64/qt6/plugins/kwin/effects/plugins/
-    install -Dm755 src/forceblur.so /usr/lib64/qt6/plugins/kwin/effects/plugins/
-    install -Dm755 src/kcm/kwin_better_blur_config.so /usr/lib64/qt6/plugins/kwin/effects/configs/
+    rpm-ostree install "$PWD/build/kwin-better-blur.rpm"
   '';
 }
