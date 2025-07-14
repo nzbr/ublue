@@ -3,7 +3,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    nix-basement.url = "github:nix-prefab/nix-basement/flake-part-stories";
+    nix-basement = {
+      url = "github:nix-prefab/nix-basement/flake-part-stories";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     razer-nari-pulseaudio-profile = {
       url = "github:imustafin/razer-nari-pulseaudio-profile";
