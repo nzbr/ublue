@@ -2,7 +2,10 @@
   "nodes": {
     "flake-parts": {
       "inputs": {
-        "nixpkgs-lib": "nixpkgs-lib"
+        "nixpkgs-lib": [
+          "nix-basement",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1733312601,
@@ -42,11 +45,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1744421721,
-        "narHash": "sha256-4OgW+8T2nkr5GRt2QVRPlwofbvX2bC8pPS6qpLtRqbI=",
+        "lastModified": 1754915748,
+        "narHash": "sha256-Zww1awfQbqnvvJjr7ZFQAzipdMjnxWdITwrcGMlnHjU=",
         "owner": "nix-prefab",
         "repo": "nix-basement",
-        "rev": "fc57a830d5491b8ab57dfa849590bb82f41d572a",
+        "rev": "9162a88a321c94586a1c41c8131395a10823a64d",
         "type": "github"
       },
       "original": {
@@ -70,18 +73,6 @@
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
-      }
-    },
-    "nixpkgs-lib": {
-      "locked": {
-        "lastModified": 1733096140,
-        "narHash": "sha256-1qRH7uAUsyQI7R1Uwl4T+XvdNv778H0Nb5njNrqvylY=",
-        "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/5487e69da40cbd611ab2cadee0b4637225f7cfae.tar.gz"
-      },
-      "original": {
-        "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/5487e69da40cbd611ab2cadee0b4637225f7cfae.tar.gz"
       }
     },
     "root": {
