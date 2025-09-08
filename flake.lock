@@ -61,11 +61,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1755615617,
-        "narHash": "sha256-HMwfAJBdrr8wXAkbGhtcby1zGFvs+StOp19xNsbqdOg=",
+        "lastModified": 1757068644,
+        "narHash": "sha256-NOrUtIhTkIIumj1E/Rsv1J37Yi3xGStISEo8tZm3KW4=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "20075955deac2583bb12f07151c2df830ef346b4",
+        "rev": "8eb28adfa3dc4de28e792e3bf49fcf9007ca8ac9",
         "type": "github"
       },
       "original": {
@@ -104,11 +104,11 @@
     "yt6801": {
       "flake": false,
       "locked": {
-        "lastModified": 1755767943,
-        "narHash": "sha256-EMhki7nYbgWxCUFvxWlWVfxUkTWj1+wrXFsgPdFTn68=",
+        "lastModified": 1756219638,
+        "narHash": "sha256-XWCdKaE2hRY7O1HXQdxORzv1dqEEA5SEThZUMP3+Idw=",
         "ref": "refs/heads/main",
-        "rev": "2377d7d97e1fb1a7eb9ddced848fdce89ad670e0",
-        "revCount": 42,
+        "rev": "920a0f1a0984942f69e747c7d7dbf384c2639784",
+        "revCount": 46,
         "type": "git",
         "url": "https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git"
       },
