@@ -80,8 +80,26 @@
         "kwin-effects-forceblur": "kwin-effects-forceblur",
         "nix-basement": "nix-basement",
         "nixpkgs": "nixpkgs",
+        "rpmpack": "rpmpack",
         "yin-yang": "yin-yang",
         "yt6801": "yt6801"
+      }
+    },
+    "rpmpack": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1753690066,
+        "narHash": "sha256-JN9U6tF6of37JKDB2qrpNTVB1p2UWWeCXpuFFF7QAp4=",
+        "owner": "google",
+        "repo": "rpmpack",
+        "rev": "2467806670a618497006ff8d8623b0430c7605a9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "google",
+        "ref": "v0.7.1",
+        "repo": "rpmpack",
+        "type": "github"
       }
     },
     "yin-yang": {

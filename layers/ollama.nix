@@ -1,5 +1,5 @@
 { lib
-, tar2rpm
+, rpmpack
 , hostPlatform
 , withRocm ? false
 , ... 
@@ -22,7 +22,7 @@ let
     rm ${file}.tgz
     tar -cf ${file}.tar -C unpack .
     rm -rf unpack
-    ${tar2rpm}/bin/tar2rpm \
+    ${rpmpack}/bin/tar2rpm \
       -use_dir_allowlist \
       -name ${replaceString "-linux-amd64" "" file} \
       -version ${last (splitString "/" baseUrl)} \

@@ -12,6 +12,10 @@
       url = "github:taj-ny/kwin-effects-forceblur";
       flake = false;
     };
+    rpmpack = {
+      url = "github:google/rpmpack/v0.7.1";
+      flake = false;
+    };
     yin-yang = {
       url = "github:oskarsh/Yin-Yang/v3.4";
       flake = false;
@@ -36,7 +40,7 @@
           pkgs.ragenix
         ];
 
-        packages.tar2rpm = pkgs.callPackage ./package/tar2rpm.nix { };
+        packages.rpmpack = pkgs.callPackage ./package/rpmpack.nix { inherit inputs; };
       };
     }
   );
