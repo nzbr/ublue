@@ -40,7 +40,7 @@ in
 
   build = ''
     ${mkRPM "ollama-linux-amd64" ""}
-    ${optionalString withRocm (mkRPM "ollama-linux-amd64-rocm" "-requires rocm")}
+    ${optionalString withRocm (mkRPM "ollama-linux-amd64-rocm" "-requires rocm -requires ollama")}
   '';
 
   install = ''
