@@ -10,6 +10,7 @@ let
     optionalString
     replaceString
     splitString
+    removePrefix
     ;
 
   baseUrl = "https://github.com/ollama/ollama/releases/download/v0.11.10";
@@ -25,7 +26,7 @@ let
     ${rpmpack}/bin/tar2rpm \
       -use_dir_allowlist \
       -name ${replaceString "-linux-amd64" "" file} \
-      -version ${last (splitString "/" baseUrl)} \
+      -version ${removePrefix "v" (last (splitString "/" baseUrl))} \
       -release tar2rpm \
       -arch x86_64 \
       -file ${file}.rpm \
