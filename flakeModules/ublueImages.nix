@@ -25,13 +25,13 @@ in
   };
 
   config = {
-    perSystem = { pkgs, config, ... }: {
+    perSystem = { self', pkgs, config, ... }: {
       ublueLayers =
         let
           layerModules = mapAttrs' (n: v: { name = removeSuffix "/default" n; value = v; }) (findModules "${root}/layers");
         in
-        # Passing pkgs should not be necessary, but somehow it doesn't work without it
-        mapAttrs (n: v: pkgs.callPackage v (pkgs // { inherit inputs; inherit lib; })) layerModules;
+        # For some reason this only works when everything is passed to the last argument of callPackage, so there's no point in using pkgs.callPackage
+        mapAttrs (n: v: lib.callPackageWith { } v (pkgs // self'.packages // { inherit inputs lib; })) layerModules;
 
       ublueImages =
         let

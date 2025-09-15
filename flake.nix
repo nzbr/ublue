@@ -35,6 +35,8 @@
           pkgs.rage
           pkgs.ragenix
         ];
+
+        packages.tar2rpm = pkgs.callPackage ./package/tar2rpm.nix { };
       };
     }
   );

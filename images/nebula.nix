@@ -7,5 +7,6 @@
     ecryptfs
     onepassword
     cider
+    (ollama.override { withRocm = true; })
   ];
 }
