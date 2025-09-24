@@ -134,7 +134,7 @@ jobs:
         id: mem
         run: |
           free=$(free -m | awk '/Mem/{printf "%d", $4}')
-          usable=$((free * 10 / 9))
+          usable=$((free * 100 / 75))
           echo "usable=${usable}" | tee -a $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
