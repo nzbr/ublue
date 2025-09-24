@@ -17,7 +17,7 @@
       flake = false;
     };
     yin-yang = {
-      url = "github:oskarsh/Yin-Yang/v3.4";
+      url = "github:oskarsh/Yin-Yang/v4.0.1";
       flake = false;
     };
     yt6801 = {
