@@ -135,14 +135,19 @@ jobs:
         run: |
           free=$(free -m | awk '/Mem/{printf "%d", $4}')
           usable=$((free * 100 / 75))
-          echo "usable=${usable}" | tee -a $GITHUB_OUTPUT
+          swap=$((16 * 1024))
+          if (( usable >= swap )); then
+            echo "opts=memory=${usable}m" | tee -a $GITHUB_OUTPUT
+          else
+            echo "opts=memory=${usable}m,memory-swap=${swap}m" | tee -a $GITHUB_OUTPUT
+          fi
 
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver: docker-container
-          driver-opts: memory=${{ steps.mem.outputs.usable }}m,memory-swap=16g
+          driver-opts: ${{ steps.mem.outputs.opts }}
 
       - name: Create empty context directory
         id: context
