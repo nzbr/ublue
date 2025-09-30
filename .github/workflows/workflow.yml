@@ -61,6 +61,7 @@ jobs:
     uses: ./.github/workflows/build-image.yml
     with:
       image_name: aurora-dx
+      cleanup_runner: true
 
   nebula:
     needs: aurora-dx
