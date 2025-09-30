@@ -7,6 +7,7 @@
     nix-mountpoint
     kde-darkly
     kde-rounded-corners
+    klassy
     kwin-effects-forceblur
     yin-yang
   ];
