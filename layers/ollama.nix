@@ -13,7 +13,7 @@ let
     removePrefix
     ;
 
-  baseUrl = "https://github.com/ollama/ollama/releases/download/v0.11.10";
+  baseUrl = "https://github.com/ollama/ollama/releases/download/v0.12.3";
 
   mkRPM = file: extraOpts:
   ''
