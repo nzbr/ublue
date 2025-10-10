@@ -15,7 +15,7 @@ let
     splitString
     ;
 
-  baseUrl = "https://github.com/ollama/ollama/releases/download/v0.11.10";
+  baseUrl = "https://github.com/ollama/ollama/releases/download/v0.12.5";
 
   mkRPM = file: deps:
   let
