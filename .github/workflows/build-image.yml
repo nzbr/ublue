@@ -166,7 +166,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       # Sign container
-      - uses: sigstore/cosign-installer@v3.10.0
+      - uses: sigstore/cosign-installer@v3.10.1
         if: github.event_name != 'pull_request'
 
       - name: Sign container image
