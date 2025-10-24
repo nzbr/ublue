@@ -31,7 +31,7 @@ jobs:
           cp -v $FILES containerfiles/
 
       - name: Upload containerfiles
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: containerfiles
           path: containerfiles
