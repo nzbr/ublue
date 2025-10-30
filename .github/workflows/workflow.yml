@@ -3,76 +3,58 @@ on:
     branches:
       - main
   schedule:
-    - cron: '05 10 * * *' # 10:05am UTC everyday
+    - cron: "05 10 * * *" # 10:05am UTC everyday
   push:
     branches:
       - main
     paths-ignore:
-      - '**/README.md'
+      - "**/README.md"
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  packages: write
+
 jobs:
-  build-containerfiles:
+  dagger:
     runs-on: ubuntu-latest
     steps:
+      - name: Maximize build space
+        uses: ublue-os/remove-unwanted-software@v9
+
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Install nix
-        uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
+      - name: Activate Nix environment
+        uses: lukas-mertens/switch-into-nix-shell@v1.0.0
 
-      - name: Build containerfiles
+      - name: Decrypt secrets
         run: |
-          FILES=$(nix eval --json .#ublueImages.x86_64-linux | jq -r keys.[] | sed -E 's|^(.*)$|.#ublueImages.x86_64-linux.\1|' | xargs nix build --json --no-link | jq -r '.[].outputs.out')
-          mkdir -p containerfiles
-          cp -v $FILES containerfiles/
+          echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/mok.key ./secrets/mok.key.age
+          echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/cosign.key ./secrets/cosign.key.age
 
-      - name: Upload containerfiles
-        uses: actions/upload-artifact@v4
+      - name: Get dagger vesion
+        id: dagger-version
+        run: |
+          dagger version | awk '{print "version="$2;}' >> $GITHUB_OUTPUT
+
+      - name: Run Dagger Workflow
+        uses: dagger/dagger-for-github@v8.2.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          name: containerfiles
-          path: containerfiles
-
-  bluefin-dx:
-    needs: build-containerfiles
-
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    secrets: inherit
-
-    uses: ./.github/workflows/build-image.yml
-    with:
-      image_name: bluefin-dx
-
-  aurora-dx:
-    needs: build-containerfiles
-
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    secrets: inherit
-
-    uses: ./.github/workflows/build-image.yml
-    with:
-      image_name: aurora-dx
-      cleanup_runner: true
-
-  nebula:
-    needs: aurora-dx
-
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    secrets: inherit
-
-    uses: ./.github/workflows/build-image.yml
-    with:
-      image_name: nebula
-      cleanup_runner: true
+          version: ${{ steps.dagger-version.outputs.version }}
+          call: >-
+            build-and-push
+            --mok=file://./secrets/mok.key
+            --cosign-key=file://./secrets/cosign.key
+            --revision=${{ github.sha }}
+            --registry=ghcr.io
+            --namespace=${{ github.repository_owner }}
+            --username=${{ github.actor }}
+            --password=env://GITHUB_TOKEN
+            --is-pr=${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+            --pr-number="${{ github.event.pull_request.number }}"

@@ -1,0 +1,7 @@
+{
+  "name": "ublue",
+  "engineVersion": "v0.19.3",
+  "sdk": {
+    "source": "typescript"
+  }
+}

@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "dagger": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1761251311,
+        "narHash": "sha256-bhmVbrrNdMPBgvfVuBJjMOJB8wzTaCApeBu+fX0ANqU=",
+        "owner": "dagger",
+        "repo": "nix",
+        "rev": "1b1e579d59431a7c1ddf18fd425083be4a56ba35",
+        "type": "github"
+      },
+      "original": {
+        "owner": "dagger",
+        "repo": "nix",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -18,22 +38,6 @@
       "original": {
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "type": "github"
-      }
-    },
-    "kwin-effects-forceblur": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1755098995,
-        "narHash": "sha256-6FN7XEf27DenQHDIKjrjOW3tGIaJlyqRlXarmt1v+M0=",
-        "owner": "taj-ny",
-        "repo": "kwin-effects-forceblur",
-        "rev": "51a1d49d7fd7df3ce40ccf6ba4c4410cf6f510e1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "taj-ny",
-        "repo": "kwin-effects-forceblur",
         "type": "github"
       }
     },
@@ -77,62 +81,9 @@
     },
     "root": {
       "inputs": {
-        "kwin-effects-forceblur": "kwin-effects-forceblur",
+        "dagger": "dagger",
         "nix-basement": "nix-basement",
-        "nixpkgs": "nixpkgs",
-        "rpmpack": "rpmpack",
-        "yin-yang": "yin-yang",
-        "yt6801": "yt6801"
-      }
-    },
-    "rpmpack": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1753690066,
-        "narHash": "sha256-JN9U6tF6of37JKDB2qrpNTVB1p2UWWeCXpuFFF7QAp4=",
-        "owner": "google",
-        "repo": "rpmpack",
-        "rev": "2467806670a618497006ff8d8623b0430c7605a9",
-        "type": "github"
-      },
-      "original": {
-        "owner": "google",
-        "ref": "v0.7.1",
-        "repo": "rpmpack",
-        "type": "github"
-      }
-    },
-    "yin-yang": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1710691143,
-        "narHash": "sha256-eBtchc3QHn5AdTFjmY9of/VcCAiJYIjwCVNUDSU8ySM=",
-        "owner": "oskarsh",
-        "repo": "Yin-Yang",
-        "rev": "9084640793b6f2799c6f13a91e4f467911ba78d2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oskarsh",
-        "ref": "v3.4",
-        "repo": "Yin-Yang",
-        "type": "github"
-      }
-    },
-    "yt6801": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1756219638,
-        "narHash": "sha256-XWCdKaE2hRY7O1HXQdxORzv1dqEEA5SEThZUMP3+Idw=",
-        "ref": "refs/heads/main",
-        "rev": "920a0f1a0984942f69e747c7d7dbf384c2639784",
-        "revCount": 46,
-        "type": "git",
-        "url": "https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git"
+        "nixpkgs": "nixpkgs"
       }
     }
   },

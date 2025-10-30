@@ -1,4 +1,7 @@
-cosign.key
-.direnv
-result
-result-*
+/sdk
+/**/node_modules/**
+/**/.pnpm-store/**
+/.env
+
+*.key
+/.direnv
