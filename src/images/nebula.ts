@@ -15,7 +15,7 @@ export default class NebulaImage extends Image {
     layers: Layer[];
 
     constructor(
-        signingKey: Secret, 
+        signingKey: Secret,
         signingKeyPub: File,
     ) {
         super();
@@ -27,7 +27,7 @@ export default class NebulaImage extends Image {
             new OnepasswordLayer(),
             new CiderLayer(),
             new MotorcommYT6801Layer(this.signingKey, this.signingKeyPub),
-            new OllamaLayer({ withRocm: true }),
+            // new OllamaLayer({ withRocm: true }),
         ];
     }
 }
