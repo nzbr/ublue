@@ -1,48 +1,58 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  extends: ['config:recommended'],
-  assignees: ['nzbr'],
-  reviewers: ['nzbr'],
+  extends: [
+    'config:recommended',
+  ],
+  assignees: [
+    'nzbr',
+  ],
+  reviewers: [
+    'nzbr',
+  ],
   automergeStrategy: 'squash',
-  labels: ['renovate'],
+  labels: [
+    'renovate',
+  ],
   nix: {
     enabled: true,
   },
   lockFileMaintenance: {
     enabled: true,
-    extends: ['schedule:weekly'],
+    extends: [
+      'schedule:weekly',
+    ],
     automerge: true,
   },
   customManagers: [
     {
-      customType: "regex",
-      fileMatch: [
-        "^.*$",
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^.*$/',
       ],
       matchStrings: [
-        "https://github.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>[^/\\s\"]+)",
+        'https://github.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>[^/\\s"]+)',
       ],
-      datasourceTemplate: "github-releases",
+      datasourceTemplate: 'github-releases',
     },
     {
-      customType: "regex",
-      fileMatch: [
-        "^.*\.ts$",
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^.*.ts$/',
       ],
       matchStrings: [
-        "fetchGit\\s*\\(\\s*\"(?<depName>[^\"]+)\"\\s*,\\s*\"(?<currentValue>[^\"]+)",
+        'fetchGit\\s*\\(\\s*"(?<depName>[^"]+)"\\s*,\\s*"(?<currentValue>[^"]+)',
       ],
-      datasourceTemplate: "git-tags",
+      datasourceTemplate: 'git-tags',
     },
     {
-      customType: "regex",
-      fileMatch: [
-        "^.*\.nix$",
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^.*.nix$/',
       ],
       matchStrings: [
-        "\"github:(?<depName>[^/]+/[^/]+)/(?<currentValue>[^/\"]+)\"",
+        '"github:(?<depName>[^/]+/[^/]+)/(?<currentValue>[^/"]+)"',
       ],
-      datasourceTemplate: "github-tags",
-    }
-  ]
+      datasourceTemplate: 'github-tags',
+    },
+  ],
 }
