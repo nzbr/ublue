@@ -3,7 +3,7 @@ import { GenericLayer, fetchGit } from "../lib";
 export class KWinEffectsForceblurLayer extends GenericLayer {
     name = "kwin-effects-forceblur";
 
-    baseBuildDir = fetchGit("https://github.com/taj-ny/kwin-effects-forceblur.git", "v1.5.0")
+    src = fetchGit("https://github.com/taj-ny/kwin-effects-forceblur.git", "v1.5.0")
 
     buildScript = `
         kf6_ver=$(rpm -q --qf '%{VERSION}' kf6-kconfigwidgets)
@@ -42,7 +42,7 @@ export class KWinEffectsForceblurLayer extends GenericLayer {
         cmake --build build -j$(nproc)
 
         cd build
-        cpack -V -G RPM 
+        cpack -V -G RPM
     `;
 
     installScript = `

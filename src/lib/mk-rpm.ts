@@ -14,7 +14,7 @@ export interface MkRpmArgs {
 
 export const mkRPM = (container: Container) => async (args: MkRpmArgs, contents: Directory) => {
     if (!args.arch) {
-        args.arch = await container.withExec(["uname", "-m"]).stdout();
+        args.arch = (await container.withExec(["uname", "-m"]).stdout()).trim();
     }
 
     const specfile = args.specfile ?? unindent`
@@ -60,14 +60,15 @@ export const mkRPM = (container: Container) => async (args: MkRpmArgs, contents:
     const gid = "1000";
 
     return container
+        .withExec(["rpm-ostree", "install", "rpm-build"])
         .withDirectory("/home", dag.directory())
         .withExec(["groupadd", "-g", gid, group])
-        .withExec(["useradd", 
-            "--uid", uid, 
-            "--gid", gid, 
+        .withExec(["useradd",
+            "--uid", uid,
+            "--gid", gid,
             "--shell", "/bin/bash",
             "--home-dir", home,
-            "--create-home", 
+            "--create-home",
             user
         ])
         .withUser(user)

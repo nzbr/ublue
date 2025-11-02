@@ -11,12 +11,12 @@ export abstract class GenericLayer implements Layer {
     buildScript: string | null = null;
     abstract installScript: string;
 
-    baseBuildDir = dag.directory()
+    src = dag.directory()
 
     extraFiles: { [key: string]: string } = {};
 
     async build(buildContainer: Container): Promise<Directory> {
-        let buildDir = this.baseBuildDir;
+        let buildDir = this.src;
 
         for (const [key, value] of Object.entries(this.extraFiles)) {
             buildDir = buildDir.withNewFile(key, unindent(value), { permissions: 0o755 });

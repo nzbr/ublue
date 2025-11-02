@@ -7,8 +7,19 @@ const gitContainer = dag.container()
     .withUser("git")
     .withWorkdir("/home/git")
 
-export function fetchGit(repo: string, ref: string): Directory {
-    return gitContainer
+type GitRepo = Directory & {
+    repo: string,
+    ref: string,
+}
+
+export function fetchGit(repo: string, ref: string): GitRepo {
+    const dir = gitContainer
         .withExec(["git", "clone", "--depth", "1", "--branch", ref, repo, "./repo"])
-        .directory("./repo")
+        .directory("./repo");
+
+    const r = dir as GitRepo;
+    r.repo = repo;
+    r.ref = ref;
+
+    return r
 }
