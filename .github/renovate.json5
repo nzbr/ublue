@@ -27,6 +27,16 @@
     {
       customType: "regex",
       fileMatch: [
+        "^.*\.ts$",
+      ],
+      matchStrings: [
+        "fetchGit\\s*\\(\\s*\"(?<depName>[^\"]+)\"\\s*,\\s*\"(?<currentValue>[^\"]+)",
+      ],
+      datasourceTemplate: "git-tags",
+    },
+    {
+      customType: "regex",
+      fileMatch: [
         "^.*\.nix$",
       ],
       matchStrings: [
