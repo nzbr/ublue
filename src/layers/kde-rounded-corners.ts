@@ -1,10 +1,45 @@
-import { GenericLayer } from "../lib";
+import { Container, dag, Directory } from "@dagger.io/dagger";
+import * as os from "os";
+import { fetchGit, GenericLayer, mkRPM } from "../lib";
 
 export class KdeRoundedCornersLayer extends GenericLayer {
     name = "kde-rounded-corners";
 
+    src = fetchGit("https://github.com/matinlotfali/KDE-Rounded-Corners", "v0.8.5");
+
+    async build(buildContainer: Container): Promise<Directory> {
+        const packages = [
+            "git",
+            "cmake",
+            "gcc-c++",
+            "extra-cmake-modules",
+            "kwin-devel",
+            "kf6-kconfigwidgets-devel",
+            "libepoxy-devel",
+            "kf6-kcmutils-devel",
+            "kf6-ki18n-devel",
+            "qt6-qtbase-private-devel",
+            "wayland-devel",
+            "libdrm-devel",
+        ];
+
+        const content = buildContainer
+            .withExec(["rpm-ostree", "install", ...packages])
+            .withMountedDirectory("/src", this.src)
+            .withExec(["cmake", "-S", "/src", "-B", "/build", "-DCMAKE_INSTALL_PREFIX=/usr"])
+            .withExec(["cmake", "--build", "/build", "--parallel", os.cpus().length.toString()])
+            .withEnvVariable("DESTDIR", "/dest")
+            .withExec(["cmake", "--install", "/build"])
+            .directory("/dest");
+
+        return dag.directory()
+            .withFile(
+                "kde-rounded-corners.rpm",
+                await mkRPM(buildContainer)({ name: "kde-rounded-corners", version: this.src.ref }, content),
+            )
+    }
+
     installScript = `
-        dnf copr enable -y matinlotfali/KDE-Rounded-Corners
-        rpm-ostree install kwin-effect-roundcorners
+        rpm-ostree install ./kde-rounded-corners.rpm
     `;
 }
