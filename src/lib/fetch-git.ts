@@ -18,7 +18,7 @@ export function fetchGit(repo: string, ref: string): GitRepo {
         .withExec(["git", "init"])
         .withExec(["git", "remote", "add", "origin", repo])
         .withExec(["git", "fetch", "origin", ref])
-        .withExec(["git", "checkout", ref])
+        .withExec(["git", "checkout", "FETCH_HEAD"])
         .directory("/repo");
 
     const r = dir as GitRepo;
