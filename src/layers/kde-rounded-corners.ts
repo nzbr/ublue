@@ -5,7 +5,8 @@ import { fetchGit, GenericLayer, mkRPM } from "../lib";
 export class KdeRoundedCornersLayer extends GenericLayer {
     name = "kde-rounded-corners";
 
-    src = fetchGit("https://github.com/matinlotfali/KDE-Rounded-Corners", "v0.8.5");
+    // src = fetchGit("https://github.com/matinlotfali/KDE-Rounded-Corners", "v0.8.5");
+    src = fetchGit("https://github.com/matinlotfali/KDE-Rounded-Corners", "4c5dce7d9190d077f51e87b095ce322a9483af97");
 
     async build(buildContainer: Container): Promise<Directory> {
         const packages = [

@@ -14,8 +14,12 @@ type GitRepo = Directory & {
 
 export function fetchGit(repo: string, ref: string): GitRepo {
     const dir = gitContainer
-        .withExec(["git", "clone", "--depth", "1", "--branch", ref, repo, "./repo"])
-        .directory("./repo");
+        .withWorkdir("/repo")
+        .withExec(["git", "init"])
+        .withExec(["git", "remote", "add", "origin", repo])
+        .withExec(["git", "fetch", "origin", ref])
+        .withExec(["git", "checkout", ref])
+        .directory("/repo");
 
     const r = dir as GitRepo;
     r.repo = repo;
