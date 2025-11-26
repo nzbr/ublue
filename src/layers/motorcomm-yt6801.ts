@@ -1,4 +1,4 @@
-import { Container, Directory, Secret, File } from "@dagger.io/dagger";
+import { Container, Secret, File } from "@dagger.io/dagger";
 import { fetchGit, Layer, unindent } from "../lib";
 
 export class MotorcommYT6801Layer implements Layer {
@@ -38,11 +38,11 @@ export class MotorcommYT6801Layer implements Layer {
             cp $(find /lib/modules -type f -name 'yt6801.ko.xz' -print) /out/${moduleFileName}
         `;
 
-        const src = fetchGit("https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git", "v1.0.30tux4")
+        const src = fetchGit("https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git", "v1.0.30tux5")
             .withNewFile("build.sh", buildScript, { permissions: 0o755 });
 
 
-        const kernelModule =  buildContainer
+        const kernelModule = buildContainer
             .withExec(["rpm-ostree", "install", "dkms"])
             .withMountedFile("/var/lib/dkms/mok.pub", this.signingKeyPub)
             .withMountedSecret("/var/lib/dkms/mok.key", this.signingKey)
