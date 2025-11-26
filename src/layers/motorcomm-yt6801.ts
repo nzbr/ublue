@@ -16,7 +16,8 @@ export class MotorcommYT6801Layer implements Layer {
         const kernelVersion = (await buildContainer
             .withExec(["rpm", "-q", "kernel"])
             .stdout())
-            .replace(/^kernel-/, "");
+            .replace(/^kernel-/, "")
+            .trim();
 
         const moduleFileName = "yt6801.ko.xz";
 
