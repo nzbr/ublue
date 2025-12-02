@@ -1,5 +1,4 @@
 import { dag, object, func, argument, Secret, File, Container } from "@dagger.io/dagger"
-import { Image } from "./lib";
 import BluefinDxImage from "./images/bluefin-dx";
 import AuroraDxImage from "./images/aurora-dx";
 import NebulaImage from "./images/nebula";
