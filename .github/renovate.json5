@@ -28,6 +28,7 @@
       matchManagers: ['regex'],
       matchDatasources: ['docker'],
       versioning: 'regex:^(?<compatibility>.+)-(?<major>\\d+)\\.(?<minor>\\d+)$',
+      automerge: true,
     },
   ],
   customManagers: [
