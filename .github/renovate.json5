@@ -23,7 +23,24 @@
     ],
     automerge: true,
   },
+  packageRules: [
+    {
+      matchManagers: ['regex'],
+      matchDatasources: ['docker'],
+      versioning: 'regex:^(?<compatibility>.+)-(?<major>\\d+).(?<minor>\\d+)$',
+    },
+  ],
   customManagers: [
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^.*\\.[jt]s$/',
+      ],
+      matchStrings: [
+        'from\\s*=\\s*["\'](?<depName>[^:]+):(?<currentValue>[^\\"]+)["\']',
+      ],
+      datasourceTemplate: 'docker',
+    },
     {
       customType: 'regex',
       managerFilePatterns: [
@@ -37,7 +54,7 @@
     {
       customType: 'regex',
       managerFilePatterns: [
-        '/^.*.ts$/',
+        '/^.*\\.[jt]s$/',
       ],
       matchStrings: [
         'fetchGit\\s*\\(\\s*"(?<depName>[^"]+)"\\s*,\\s*"(?<currentValue>[^"]+)',

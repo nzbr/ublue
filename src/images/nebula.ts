@@ -3,7 +3,6 @@ import { CiderLayer, EcryptfsLayer, MotorcommYT6801Layer } from "../layers";
 import { OnepasswordLayer } from "../layers/onepassword";
 import { Image, Layer } from "../lib";
 import AuroraDxImage from "./aurora-dx";
-import { OllamaLayer } from "../layers/ollama";
 
 export default class NebulaImage extends Image {
     name = "nebula";
