@@ -3,6 +3,8 @@ import { CiderLayer, EcryptfsLayer, MotorcommYT6801Layer } from "../layers";
 import { OnepasswordLayer } from "../layers/onepassword";
 import { Image, Layer } from "../lib";
 import AuroraDxImage from "./aurora-dx";
+import { PAMU2FLayer } from "../layers/pam-u2f";
+import { PamFprintdLayer } from "../layers/pam-fprintd";
 
 export default class NebulaImage extends Image {
     name = "nebula";
@@ -27,6 +29,8 @@ export default class NebulaImage extends Image {
             new CiderLayer(),
             new MotorcommYT6801Layer(this.signingKey, this.signingKeyPub),
             // new OllamaLayer({ withRocm: true }),
+            new PAMU2FLayer(),
+            new PamFprintdLayer(),
         ];
     }
 }
