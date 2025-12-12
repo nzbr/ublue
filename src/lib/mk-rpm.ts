@@ -55,6 +55,7 @@ export const mkRPM = (container: Container) => async (args: MkRpmArgs, contents:
 
     const user = "rpmbuild";
     const group = "rpmbuild";
+    const shell = "/bin/bash";
     const home = `/home/${user}`;
     const uid = "1000";
     const gid = "1000";
@@ -62,17 +63,10 @@ export const mkRPM = (container: Container) => async (args: MkRpmArgs, contents:
     return container
         .withExec(["rpm-ostree", "install", "rpm-build"])
         .withDirectory("/home", dag.directory())
-        .withExec(["groupadd", "-g", gid, group])
-        .withExec(["useradd",
-            "--uid", uid,
-            "--gid", gid,
-            "--shell", "/bin/bash",
-            "--home-dir", home,
-            "--create-home",
-            user
-        ])
+        .withExec(["sh", "-c", `getent group ${group} || groupadd -g ${gid} ${group}`])
+        .withExec(["sh", "-c", `getent passwd ${user} && usermod --shell ${shell} --home ${home} ${user} || useradd --uid ${uid} --gid ${group} --shell ${shell} --home-dir ${home} --create-home ${user}`])
         .withUser(user)
-        .withMountedDirectory(`${home}/rpmbuild`, workspace, { owner: `${uid}:${gid}` })
+        .withMountedDirectory(`${home}/rpmbuild`, workspace, { owner: `${user}:${group}` })
         .withMountedDirectory(`${home}/rpmbuild/SOURCES/${args.name}`, contents)
         .withWorkdir(`${home}/rpmbuild/SOURCES/${args.name}`)
         .withExec(["sh", "-c", `find . -not -type d | sed 's/^\\.//' >> ${home}/rpmbuild/SPECS/${args.name}.spec`])
