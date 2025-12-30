@@ -3,7 +3,7 @@ import { Image } from "../lib";
 
 export default class BluefinDxImage extends Image {
     name = "bluefin-dx";
-    from = "ghcr.io/ublue-os/bluefin-dx:stable-43.20251209";
+    from = "ghcr.io/ublue-os/bluefin-dx:stable-43.20251230";
 
     layers = [
         new RpmOstreeTweaksLayer(),
