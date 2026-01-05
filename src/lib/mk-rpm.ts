@@ -57,14 +57,12 @@ export const mkRPM = (container: Container) => async (args: MkRpmArgs, contents:
     const group = "rpmbuild";
     const shell = "/bin/bash";
     const home = `/home/${user}`;
-    const uid = "1000";
-    const gid = "1000";
 
     return container
         .withExec(["dnf", "install", "-y", "rpm-build"])
         .withDirectory("/home", dag.directory())
-        .withExec(["sh", "-c", `getent group ${group} || groupadd -g ${gid} ${group}`])
-        .withExec(["sh", "-c", `getent passwd ${user} && usermod --shell ${shell} --home ${home} ${user} || useradd --uid ${uid} --gid ${group} --shell ${shell} --home-dir ${home} --create-home ${user}`])
+        .withExec(["sh", "-c", `getent group ${group} || groupadd ${group}`])
+        .withExec(["sh", "-c", `getent passwd ${user} && usermod --shell ${shell} --home ${home} ${user} || useradd --gid ${group} --shell ${shell} --home-dir ${home} --create-home ${user}`])
         .withUser(user)
         .withMountedDirectory(`${home}/rpmbuild`, workspace, { owner: `${user}:${group}` })
         .withMountedDirectory(`${home}/rpmbuild/SOURCES/${args.name}`, contents)
