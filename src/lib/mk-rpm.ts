@@ -61,7 +61,7 @@ export const mkRPM = (container: Container) => async (args: MkRpmArgs, contents:
     const gid = "1000";
 
     return container
-        .withExec(["rpm-ostree", "install", "rpm-build"])
+        .withExec(["dnf", "install", "-y", "rpm-build"])
         .withDirectory("/home", dag.directory())
         .withExec(["sh", "-c", `getent group ${group} || groupadd -g ${gid} ${group}`])
         .withExec(["sh", "-c", `getent passwd ${user} && usermod --shell ${shell} --home ${home} ${user} || useradd --uid ${uid} --gid ${group} --shell ${shell} --home-dir ${home} --create-home ${user}`])

@@ -33,7 +33,7 @@ export class OnepasswordLayer extends GenericLayer {
         cp "./1password.asc" /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
         rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
 
-        rpm-ostree install 1password 1password-cli
+        dnf install -y 1password 1password-cli
 
         # >>>>> Copied verbatim from the blue-build module <<<<<
 

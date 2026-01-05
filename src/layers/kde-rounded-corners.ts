@@ -25,7 +25,7 @@ export class KdeRoundedCornersLayer extends GenericLayer {
         ];
 
         const content = buildContainer
-            .withExec(["rpm-ostree", "install", ...packages])
+            .withExec(["dnf", "install", "-y", ...packages])
             .withMountedDirectory("/src", this.src)
             .withExec(["cmake", "-S", "/src", "-B", "/build", "-DCMAKE_INSTALL_PREFIX=/usr"])
             .withExec(["cmake", "--build", "/build", "--parallel", os.cpus().length.toString()])
@@ -41,6 +41,6 @@ export class KdeRoundedCornersLayer extends GenericLayer {
     }
 
     installScript = `
-        rpm-ostree install ./kde-rounded-corners.rpm
+        dnf install -y ./kde-rounded-corners.rpm
     `;
 }

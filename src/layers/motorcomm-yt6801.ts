@@ -43,7 +43,7 @@ export class MotorcommYT6801Layer implements Layer {
 
 
         const kernelModule = buildContainer
-            .withExec(["rpm-ostree", "install", "dkms"])
+            .withExec(["dnf", "install", "-y", "dkms"])
             .withMountedFile("/var/lib/dkms/mok.pub", this.signingKeyPub)
             .withMountedSecret("/var/lib/dkms/mok.key", this.signingKey)
             .withMountedDirectory("/build", src)

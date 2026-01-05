@@ -6,7 +6,7 @@ export class KWinEffectsForceblurLayer extends GenericLayer {
     src = fetchGit("https://github.com/taj-ny/kwin-effects-forceblur.git", "v1.5.0")
 
     buildScript = `
-        rpm-ostree install \\
+        dnf install -y \\
         cmake \\
         extra-cmake-modules \\
         gcc-g++ \\
@@ -44,6 +44,6 @@ export class KWinEffectsForceblurLayer extends GenericLayer {
     `;
 
     installScript = `
-        rpm-ostree install "$PWD/build/kwin-better-blur.rpm"
+        dnf install -y ./build/kwin-better-blur.rpm
     `;
 }

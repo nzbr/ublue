@@ -11,12 +11,12 @@ export class CiderLayer extends GenericLayer {
     }
 
     buildScript = null;
-    
+
     installScript = `
         cp "./cidercollective.repo" /etc/yum.repos.d/cidercollective.repo
         cp "./cidercollective.asc" /etc/pki/rpm-gpg/RPM-GPG-KEY-cidercollective
         rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-cidercollective
 
-        rpm-ostree install Cider
+        dnf install -y Cider
     `;
 }

@@ -8,7 +8,7 @@ export class LibFprintTodLayer extends GenericLayer {
 
     async build(buildContainer: Container): Promise<Directory> {
         let container = buildContainer
-            .withExec(["rpm-ostree", "install",
+            .withExec(["dnf", "install", "-y",
                 "meson",
                 "cmake",
                 "gcc-c++",
@@ -70,7 +70,7 @@ export class SynatudorLayer extends GenericLayer {
 
     async build(buildContainer: Container): Promise<Directory> {
         let container = buildContainer
-            .withExec(["rpm-ostree", "install",
+            .withExec(["dnf", "install", "-y",
                 "meson",
                 "cmake",
                 "gcc",

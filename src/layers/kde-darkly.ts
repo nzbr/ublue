@@ -5,6 +5,6 @@ export class KdeDarklyLayer extends GenericLayer {
 
     installScript = `
         dnf copr enable -y deltacopy/darkly
-        rpm-ostree install darkly
+        dnf install -y darkly
     `;
 }
