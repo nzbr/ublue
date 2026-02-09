@@ -1,14 +1,14 @@
-import { Secret, File } from "@dagger.io/dagger";
+import { File, Secret } from "@dagger.io/dagger";
 import { CiderLayer, EcryptfsLayer, MotorcommYT6801Layer } from "../layers";
 import { OnepasswordLayer } from "../layers/onepassword";
-import { Image, Layer } from "../lib";
-import AuroraDxImage from "./aurora-dx";
-import { PAMU2FLayer } from "../layers/pam-u2f";
 import { PamFprintdLayer } from "../layers/pam-fprintd";
+import { PAMU2FLayer } from "../layers/pam-u2f";
+import { Image, Layer } from "../lib";
+import CosmicAtomicImage from "./cosmic-atomic";
 
 export default class NebulaImage extends Image {
     name = "nebula";
-    from = new AuroraDxImage().build();
+    from = new CosmicAtomicImage().build();
 
     signingKey: Secret;
     signingKeyPub: File;

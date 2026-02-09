@@ -2,10 +2,16 @@ import { dag, object, func, argument, Secret, File, Container } from "@dagger.io
 import BluefinDxImage from "./images/bluefin-dx";
 import AuroraDxImage from "./images/aurora-dx";
 import NebulaImage from "./images/nebula";
+import CosmicAtomicImage from "./images/cosmic-atomic";
 
 @object()
 export class Ublue {
   constructor() { }
+
+  @func()
+  auroraDx(): Promise<Container> {
+    return new AuroraDxImage().build()
+  }
 
   @func()
   bluefinDx(): Promise<Container> {
@@ -13,8 +19,8 @@ export class Ublue {
   }
 
   @func()
-  auroraDx(): Promise<Container> {
-    return new AuroraDxImage().build()
+  cosmicAtomic(): Promise<Container> {
+    return new CosmicAtomicImage().build()
   }
 
   @func()
@@ -41,8 +47,9 @@ export class Ublue {
     const timestamp = new Date().toISOString();
 
     const images = [
-      await new BluefinDxImage(),
       await new AuroraDxImage(),
+      await new BluefinDxImage(),
+      await new CosmicAtomicImage(),
       await new NebulaImage(mok, mokPub),
     ];
 
