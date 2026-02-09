@@ -31,7 +31,7 @@ export default class NebulaImage extends Image {
             new MotorcommYT6801Layer(this.signingKey, this.signingKeyPub),
             // new OllamaLayer({ withRocm: true }),
             new PAMU2FLayer(),
-            new PamFprintdLayer(),
+            // new PamFprintdLayer(),
             new AntigravityLayer(),
         ];
     }
