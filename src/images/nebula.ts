@@ -5,6 +5,7 @@ import { PamFprintdLayer } from "../layers/pam-fprintd";
 import { PAMU2FLayer } from "../layers/pam-u2f";
 import { Image, Layer } from "../lib";
 import CosmicAtomicImage from "./cosmic-atomic";
+import { AntigravityLayer } from "../layers/antigravity";
 
 export default class NebulaImage extends Image {
     name = "nebula";
@@ -31,6 +32,7 @@ export default class NebulaImage extends Image {
             // new OllamaLayer({ withRocm: true }),
             new PAMU2FLayer(),
             new PamFprintdLayer(),
+            new AntigravityLayer(),
         ];
     }
 }
