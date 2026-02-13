@@ -5,6 +5,8 @@ export class CosmicLayer extends GenericLayer {
 
     // cosmic-store is not included, because universal-blue images use Bazaar instead
     installScript = `
+        dnf copr enable -y ryanabx/cosmic-epoch
+
         dnf install -y \
             cosmic-edit \
             cosmic-files \
@@ -13,7 +15,8 @@ export class CosmicLayer extends GenericLayer {
             cosmic-player \
             cosmic-session \
             cosmic-term \
-            cosmic-config-fedora
+            cosmic-config-fedora \
+            cosmic-desktop # this package is from the COPR
 
         systemctl disable gdm.service sddm.service || true
         systemctl enable cosmic-greeter.service
