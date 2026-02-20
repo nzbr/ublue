@@ -47,7 +47,7 @@ export class Ublue {
     const timestamp = new Date().toISOString();
 
     const images = [
-      await new AuroraDxImage(),
+      // await new AuroraDxImage(),
       await new BluefinDxImage(),
       await new CosmicAtomicImage(),
       await new NebulaImage(mok, mokPub),
