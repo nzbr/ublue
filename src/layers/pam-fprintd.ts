@@ -4,7 +4,7 @@ import { fetchGit, GenericLayer, Layer, mkRPM, unindent } from "../lib";
 export class LibFprintTodLayer extends GenericLayer {
     name = "libfprint-tod";
 
-    src = fetchGit("https://gitlab.freedesktop.org/3v1n0/libfprint.git", "v1.94.9+tod1");
+    src = fetchGit("https://gitlab.freedesktop.org/3v1n0/libfprint.git", "v1.95.0+tod1");
 
     async build(buildContainer: Container): Promise<Directory> {
         let container = buildContainer
