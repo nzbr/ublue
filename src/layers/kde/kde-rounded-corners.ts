@@ -1,6 +1,6 @@
 import { Container, dag, Directory } from "@dagger.io/dagger";
 import * as os from "os";
-import { fetchGit, GenericLayer, mkRPM } from "../lib";
+import { fetchGit, GenericLayer, mkRPM } from "../../lib";
 
 export class KdeRoundedCornersLayer extends GenericLayer {
     name = "kde-rounded-corners";

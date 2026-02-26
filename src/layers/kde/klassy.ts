@@ -1,6 +1,6 @@
 import * as os from "os";
 import { Container, dag, Directory } from "@dagger.io/dagger";
-import { fetchGit, GenericLayer, mkRPM } from "../lib";
+import { fetchGit, GenericLayer, mkRPM } from "../../lib";
 
 export class KlassyLayer extends GenericLayer {
     name = "klassy";

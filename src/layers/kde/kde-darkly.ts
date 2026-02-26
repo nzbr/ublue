@@ -1,4 +1,4 @@
-import { GenericLayer } from "../lib";
+import { GenericLayer } from "../../lib";
 
 export class KdeDarklyLayer extends GenericLayer {
     name = "kde-darkly";

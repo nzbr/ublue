@@ -1,5 +1,4 @@
-import { KdeDarklyLayer, KdeRoundedCornersLayer, KlassyLayer, NixMountpointLayer, NoFlatpakAutoUpdateLayer, RpmOstreeTweaksLayer } from "../layers";
-import { KWinEffectsForceblurLayer } from "../layers/kwin-effects-forceblur";
+import { KdeDarklyLayer, KdeRoundedCornersLayer, KlassyLayer, KWinEffectsForceblurLayer, NixMountpointLayer, NoFlatpakAutoUpdateLayer, RpmOstreeTweaksLayer } from "../layers";
 import { Image } from "../lib";
 
 export default class AuroraDxImage extends Image {

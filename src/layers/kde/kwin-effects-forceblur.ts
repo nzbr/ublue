@@ -1,4 +1,4 @@
-import { GenericLayer, fetchGit } from "../lib";
+import { GenericLayer, fetchGit } from "../../lib";
 
 export class KWinEffectsForceblurLayer extends GenericLayer {
     name = "kwin-effects-forceblur";
