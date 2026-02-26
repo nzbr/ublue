@@ -1,4 +1,4 @@
-import { KdeDarklyLayer, KdeRoundedCornersLayer, KlassyLayer, KWinEffectsForceblurLayer, NixMountpointLayer, NoFlatpakAutoUpdateLayer, RpmOstreeTweaksLayer } from "../layers";
+import { KdeDarklyLayer, KdeRoundedCornersLayer, KlassyLayer, KWinEffectsForceblurLayer, NixMountpointLayer, NoFlatpakAutoUpdateLayer, RpmOstreeTweaksLayer, SudoTweaksLayer } from "../layers";
 import { Image } from "../lib";
 
 export default class AuroraDxImage extends Image {
@@ -8,6 +8,7 @@ export default class AuroraDxImage extends Image {
     layers = [
         new RpmOstreeTweaksLayer(),
         new NoFlatpakAutoUpdateLayer(),
+        new SudoTweaksLayer(),
         new NixMountpointLayer(),
         new KdeDarklyLayer(),
         new KdeRoundedCornersLayer(),

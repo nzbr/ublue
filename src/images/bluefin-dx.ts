@@ -1,4 +1,4 @@
-import { NixMountpointLayer, NoFlatpakAutoUpdateLayer, RpmOstreeTweaksLayer } from "../layers";
+import { NixMountpointLayer, NoFlatpakAutoUpdateLayer, RpmOstreeTweaksLayer, SudoTweaksLayer } from "../layers";
 import { Image } from "../lib";
 
 export default class BluefinDxImage extends Image {
@@ -8,6 +8,7 @@ export default class BluefinDxImage extends Image {
     layers = [
         new RpmOstreeTweaksLayer(),
         new NoFlatpakAutoUpdateLayer(),
+        new SudoTweaksLayer(),
         new NixMountpointLayer(),
     ];
 }

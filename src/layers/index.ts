@@ -9,3 +9,4 @@ export * from "./nix-mountpoint";
 export * from "./no-flatpak-auto-update";
 export * from "./onepassword";
 export * from "./rpm-ostree-tweaks";
+export * from "./sudo-tweaks";
