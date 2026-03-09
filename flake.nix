@@ -27,7 +27,7 @@
           pkgs.ragenix
 
           inputs.dagger.packages.${system}.dagger
-          pkgs.corepack
+          pkgs.bun
         ];
       };
     }
