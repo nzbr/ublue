@@ -3,7 +3,6 @@ import { GenericLayer } from "../lib";
 export class CosmicLayer extends GenericLayer {
     name = "cosmic";
 
-    // cosmic-store is not included, because universal-blue images use Bazaar instead
     installScript = `
         dnf copr enable -y ryanabx/cosmic-epoch
 
