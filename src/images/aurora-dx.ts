@@ -3,7 +3,7 @@ import { Image } from "../lib";
 
 export default class AuroraDxImage extends Image {
     name = "aurora-dx";
-    from = "ghcr.io/ublue-os/aurora-dx:stable-43.20260303";
+    from = "ghcr.io/ublue-os/aurora-dx:stable-43.20260310";
 
     layers = [
         new RpmOstreeTweaksLayer(),
