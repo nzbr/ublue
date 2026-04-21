@@ -1,4 +1,5 @@
 import { NixMountpointLayer, NoFlatpakAutoUpdateLayer, RpmOstreeTweaksLayer, SudoTweaksLayer } from "../layers";
+import { CopperflameMonoLayer } from "../layers/copperflame-mono";
 import { Image } from "../lib";
 
 export default class BluefinDxImage extends Image {
@@ -10,5 +11,6 @@ export default class BluefinDxImage extends Image {
         new NoFlatpakAutoUpdateLayer(),
         new SudoTweaksLayer(),
         new NixMountpointLayer(),
+        new CopperflameMonoLayer(),
     ];
 }
