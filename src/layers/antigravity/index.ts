@@ -6,8 +6,11 @@ export class AntigravityLayer extends GenericLayer {
     name = "antigravity";
 
     extraFiles = {
-        "antigravity.repo": fs.readFileSync(path.resolve(import.meta.dirname, "antigravity.repo"), "utf-8"),
-    }
+        "antigravity.repo": fs.readFileSync(
+            path.resolve(import.meta.dirname, "antigravity.repo"),
+            "utf-8",
+        ),
+    };
 
     installScript = `
         cp ./antigravity.repo /etc/yum.repos.d/antigravity.repo

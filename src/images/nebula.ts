@@ -33,10 +33,7 @@ export default class NebulaImage extends Image {
 
     layers: Layer[];
 
-    constructor(
-        signingKey: Secret,
-        signingKeyPub: File,
-    ) {
+    constructor(signingKey: Secret, signingKeyPub: File) {
         super();
         this.signingKey = signingKey;
         this.signingKeyPub = signingKeyPub;

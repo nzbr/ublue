@@ -12,10 +12,13 @@ export class MotorcommYT6801Layer implements Layer {
         this.signingKeyPub = signingKeyPub;
     }
 
-    async install(buildContainer: Container, targetContainer: Container): Promise<Container> {
-        const kernelVersion = (await buildContainer
-            .withExec(["rpm", "-q", "kernel"])
-            .stdout())
+    async install(
+        buildContainer: Container,
+        targetContainer: Container,
+    ): Promise<Container> {
+        const kernelVersion = (
+            await buildContainer.withExec(["rpm", "-q", "kernel"]).stdout()
+        )
             .replace(/^kernel-/, "")
             .trim();
 
@@ -38,9 +41,10 @@ export class MotorcommYT6801Layer implements Layer {
             cp $(find /lib/modules -type f -name 'yt6801.ko.xz' -print) /out/${moduleFileName}
         `;
 
-        const src = fetchGit("https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git", "v1.0.30tux5")
-            .withNewFile("build.sh", buildScript, { permissions: 0o755 });
-
+        const src = fetchGit(
+            "https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git",
+            "v1.0.30tux5",
+        ).withNewFile("build.sh", buildScript, { permissions: 0o755 });
 
         const kernelModule = buildContainer
             .withExec(["dnf", "install", "-y", "dkms"])
@@ -74,11 +78,22 @@ export class MotorcommYT6801Layer implements Layer {
         `;
 
         return targetContainer
-            .withFile(`/lib/modules/${kernelVersion}/extra/${moduleFileName}`, kernelModule)
+            .withFile(
+                `/lib/modules/${kernelVersion}/extra/${moduleFileName}`,
+                kernelModule,
+            )
             .withFile(`/usr/lib/dkms/mok.pub`, this.signingKeyPub)
-            .withNewFile(`/usr/lib/dkms/setup-mok.sh`, setupScript, { permissions: 0o755 })
-            .withNewFile(`/usr/lib/systemd/system/mok-setup.service`, setupUnit, { permissions: 0o644 })
-            .withNewFile(`/usr/lib/modules-load.d/yt6801.conf`, "yt6801\n", { permissions: 0o644 })
-            .withExec(["systemctl", "enable", "mok-setup.service"])
+            .withNewFile(`/usr/lib/dkms/setup-mok.sh`, setupScript, {
+                permissions: 0o755,
+            })
+            .withNewFile(
+                `/usr/lib/systemd/system/mok-setup.service`,
+                setupUnit,
+                { permissions: 0o644 },
+            )
+            .withNewFile(`/usr/lib/modules-load.d/yt6801.conf`, "yt6801\n", {
+                permissions: 0o644,
+            })
+            .withExec(["systemctl", "enable", "mok-setup.service"]);
     }
 }

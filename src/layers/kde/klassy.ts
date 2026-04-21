@@ -45,18 +45,35 @@ export class KlassyLayer extends GenericLayer {
         const content = buildContainer
             .withExec(["dnf", "install", "-y", ...packages])
             .withMountedDirectory("/src", this.src)
-            .withExec(["cmake", "-S", "/src", "-B", "/build", "-DCMAKE_INSTALL_PREFIX=/usr"])
-            .withExec(["cmake", "--build", "/build", "--parallel", os.cpus().length.toString()])
+            .withExec([
+                "cmake",
+                "-S",
+                "/src",
+                "-B",
+                "/build",
+                "-DCMAKE_INSTALL_PREFIX=/usr",
+            ])
+            .withExec([
+                "cmake",
+                "--build",
+                "/build",
+                "--parallel",
+                os.cpus().length.toString(),
+            ])
             .withEnvVariable("DESTDIR", "/dest")
             .withExec(["cmake", "--install", "/build"])
             .directory("/dest");
 
-        return dag.directory()
+        return dag
+            .directory()
             .withFile(
                 "klassy.rpm",
-                await mkRPM(buildContainer)({ name: "klassy", version: this.src.ref }, content),
-            )
-    };
+                await mkRPM(buildContainer)(
+                    { name: "klassy", version: this.src.ref },
+                    content,
+                ),
+            );
+    }
 
     installScript = `
         dnf install -y ./klassy.rpm

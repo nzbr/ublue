@@ -4,7 +4,7 @@ export class SudoTweaksLayer extends GenericLayer {
     name = "sudo-tweaks";
 
     extraFiles = {
-        "pwfeedback": `
+        pwfeedback: `
             Defaults pwfeedback
         `,
     };

@@ -21,7 +21,7 @@ export class RpmOstreeTweaksLayer extends GenericLayer {
             #
             # See [future link] for more information
             ##########
-            # LockLayering=false  
+            # LockLayering=false
         `,
         "org.projectatomic.rpmostree1.rules": `
             polkit.addRule(function(action, subject) {
@@ -31,8 +31,8 @@ export class RpmOstreeTweaksLayer extends GenericLayer {
                     subject.local == true) {
                         return polkit.Result.YES;
                 }
-            });            
-        `
+            });
+        `,
     };
 
     installScript = `

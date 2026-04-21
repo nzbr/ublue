@@ -10,8 +10,14 @@ export class OnepasswordLayer extends GenericLayer {
     name = "onepassword";
 
     extraFiles = {
-        "1password.repo": fs.readFileSync(path.resolve(import.meta.dirname, "1password.repo"), "utf-8"),
-        "1password.asc": fs.readFileSync(path.resolve(import.meta.dirname, "1password.asc"), "utf-8"),
+        "1password.repo": fs.readFileSync(
+            path.resolve(import.meta.dirname, "1password.repo"),
+            "utf-8",
+        ),
+        "1password.asc": fs.readFileSync(
+            path.resolve(import.meta.dirname, "1password.asc"),
+            "utf-8",
+        ),
         "sysusers-onepassword.conf": unindent`
             g onepassword ${GID_ONEPASSWORD}
         `,

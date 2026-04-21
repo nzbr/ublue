@@ -3,7 +3,10 @@ import { GenericLayer, fetchGit } from "../../lib";
 export class KWinEffectsForceblurLayer extends GenericLayer {
     name = "kwin-effects-forceblur";
 
-    src = fetchGit("https://github.com/taj-ny/kwin-effects-forceblur.git", "v1.5.0")
+    src = fetchGit(
+        "https://github.com/taj-ny/kwin-effects-forceblur.git",
+        "v1.5.0",
+    );
 
     buildScript = `
         dnf install -y \\

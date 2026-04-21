@@ -6,9 +6,15 @@ export class CiderLayer extends GenericLayer {
     name = "cider";
 
     extraFiles = {
-        "cidercollective.repo": fs.readFileSync(path.resolve(import.meta.dirname, "cidercollective.repo"), "utf-8"),
-        "cidercollective.asc": fs.readFileSync(path.resolve(import.meta.dirname, "cidercollective.asc"), "utf-8"),
-    }
+        "cidercollective.repo": fs.readFileSync(
+            path.resolve(import.meta.dirname, "cidercollective.repo"),
+            "utf-8",
+        ),
+        "cidercollective.asc": fs.readFileSync(
+            path.resolve(import.meta.dirname, "cidercollective.asc"),
+            "utf-8",
+        ),
+    };
 
     buildScript = null;
 

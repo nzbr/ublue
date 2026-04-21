@@ -12,12 +12,17 @@ export interface MkRpmArgs {
     specfile?: string;
 }
 
-export const mkRPM = (container: Container) => async (args: MkRpmArgs, contents: Directory) => {
-    if (!args.arch) {
-        args.arch = (await container.withExec(["uname", "-m"]).stdout()).trim();
-    }
+export const mkRPM =
+    (container: Container) => async (args: MkRpmArgs, contents: Directory) => {
+        if (!args.arch) {
+            args.arch = (
+                await container.withExec(["uname", "-m"]).stdout()
+            ).trim();
+        }
 
-    const specfile = args.specfile ?? unindent`
+        const specfile =
+            args.specfile ??
+            unindent`
         AutoReqProv: no
 
         Name: ${args.name}
@@ -43,36 +48,58 @@ export const mkRPM = (container: Container) => async (args: MkRpmArgs, contents:
         %files
     `;
 
-    const workspace = dag.directory()
-        .withNewDirectory("BUILD", { permissions: 0o755 })
-        .withNewDirectory("BUILDROOT", { permissions: 0o755 })
-        .withNewDirectory("RPMS", { permissions: 0o755 })
-        .withNewDirectory("SOURCES", { permissions: 0o755 })
-        .withNewDirectory("SPECS", { permissions: 0o755 })
-        .withNewDirectory("SRPMS", { permissions: 0o755 })
-        .withNewFile(`SPECS/${args.name}.spec`, specfile, { permissions: 0o644 })
-        ;
+        const workspace = dag
+            .directory()
+            .withNewDirectory("BUILD", { permissions: 0o755 })
+            .withNewDirectory("BUILDROOT", { permissions: 0o755 })
+            .withNewDirectory("RPMS", { permissions: 0o755 })
+            .withNewDirectory("SOURCES", { permissions: 0o755 })
+            .withNewDirectory("SPECS", { permissions: 0o755 })
+            .withNewDirectory("SRPMS", { permissions: 0o755 })
+            .withNewFile(`SPECS/${args.name}.spec`, specfile, {
+                permissions: 0o644,
+            });
+        const user = "rpmbuild";
+        const group = "rpmbuild";
+        const shell = "/bin/bash";
+        const home = `/home/${user}`;
 
-    const user = "rpmbuild";
-    const group = "rpmbuild";
-    const shell = "/bin/bash";
-    const home = `/home/${user}`;
-
-    return container
-        .withExec(["dnf", "install", "-y", "rpm-build"])
-        .withDirectory("/home", dag.directory())
-        .withExec(["sh", "-c", `getent group ${group} || groupadd ${group}`])
-        .withExec(["sh", "-c", `getent passwd ${user} && usermod --shell ${shell} --home ${home} ${user} || useradd --gid ${group} --shell ${shell} --home-dir ${home} --create-home ${user}`])
-        .withUser(user)
-        .withDirectory("/tmp", dag.directory(), { owner: user })
-        .withMountedDirectory(`${home}/rpmbuild`, workspace, { owner: `${user}:${group}` })
-        .withMountedDirectory(`${home}/rpmbuild/SOURCES/${args.name}`, contents, { owner: `${user}:${group}` })
-        .withWorkdir(`${home}/rpmbuild/SOURCES/${args.name}`)
-        .withExec(["chmod", "u+rw", "-R", "."])
-        .withExec(["sh", "-c", `find . -not -type d | sed 's/^\\.//' >> ${home}/rpmbuild/SPECS/${args.name}.spec`])
-        .withWorkdir(home)
-        .withExec(["rpmbuild", "-bb", `rpmbuild/SPECS/${args.name}.spec`])
-        .withExec(["sh", "-c", `mv rpmbuild/RPMS/${args.arch}/*.rpm ${args.name}-${args.version}.${args.arch}.rpm`])
-        .file(`${args.name}-${args.version}.${args.arch}.rpm`);
-
-}
+        return container
+            .withExec(["dnf", "install", "-y", "rpm-build"])
+            .withDirectory("/home", dag.directory())
+            .withExec([
+                "sh",
+                "-c",
+                `getent group ${group} || groupadd ${group}`,
+            ])
+            .withExec([
+                "sh",
+                "-c",
+                `getent passwd ${user} && usermod --shell ${shell} --home ${home} ${user} || useradd --gid ${group} --shell ${shell} --home-dir ${home} --create-home ${user}`,
+            ])
+            .withUser(user)
+            .withDirectory("/tmp", dag.directory(), { owner: user })
+            .withMountedDirectory(`${home}/rpmbuild`, workspace, {
+                owner: `${user}:${group}`,
+            })
+            .withMountedDirectory(
+                `${home}/rpmbuild/SOURCES/${args.name}`,
+                contents,
+                { owner: `${user}:${group}` },
+            )
+            .withWorkdir(`${home}/rpmbuild/SOURCES/${args.name}`)
+            .withExec(["chmod", "u+rw", "-R", "."])
+            .withExec([
+                "sh",
+                "-c",
+                `find . -not -type d | sed 's/^\\.//' >> ${home}/rpmbuild/SPECS/${args.name}.spec`,
+            ])
+            .withWorkdir(home)
+            .withExec(["rpmbuild", "-bb", `rpmbuild/SPECS/${args.name}.spec`])
+            .withExec([
+                "sh",
+                "-c",
+                `mv rpmbuild/RPMS/${args.arch}/*.rpm ${args.name}-${args.version}.${args.arch}.rpm`,
+            ])
+            .file(`${args.name}-${args.version}.${args.arch}.rpm`);
+    };

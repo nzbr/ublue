@@ -11,7 +11,10 @@ export const fetchTarball = (container: Container) => (url: string) => {
         throw new Error(`No file extension found in URL: ${url}`);
     }
 
-    const download = container.withWorkdir("/dl").withExec(["curl", "-L", "-o", basename, url]).withWorkdir("/unpack");
+    const download = container
+        .withWorkdir("/dl")
+        .withExec(["curl", "-L", "-o", basename, url])
+        .withWorkdir("/unpack");
 
     let unpacked;
     switch (ext) {
@@ -20,7 +23,13 @@ export const fetchTarball = (container: Container) => (url: string) => {
             break;
         case "gz":
         case "tgz":
-            unpacked = download.withExec(["tar", "-I", "pigz", "-xvf", `/dl/${basename}`]);
+            unpacked = download.withExec([
+                "tar",
+                "-I",
+                "pigz",
+                "-xvf",
+                `/dl/${basename}`,
+            ]);
             break;
         case "bz2":
             unpacked = download.withExec(["tar", "-xvjf", `/dl/${basename}`]);
@@ -30,7 +39,12 @@ export const fetchTarball = (container: Container) => (url: string) => {
             unpacked = download.withExec(["tar", "-xvJf", `/dl/${basename}`]);
             break;
         case "zst":
-            unpacked = download.withExec(["tar", "--zstd", "-xvf", `/dl/${basename}`]);
+            unpacked = download.withExec([
+                "tar",
+                "--zstd",
+                "-xvf",
+                `/dl/${basename}`,
+            ]);
             break;
         case "zip":
             unpacked = download.withExec(["unzip", `/dl/${basename}`]);
@@ -39,4 +53,4 @@ export const fetchTarball = (container: Container) => (url: string) => {
             throw new Error(`Unsupported extension: ${ext}`);
     }
     return unpacked.directory("/unpack");
-}
+};
