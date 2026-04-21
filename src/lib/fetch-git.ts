@@ -12,16 +12,21 @@ type GitRepo = Directory & {
     ref: string,
 }
 
-export function fetchGit(repo: string, ref: string): GitRepo {
-    const dir = gitContainer
+export function fetchGit(repo: string, ref: string, submodules: boolean = false): GitRepo {
+    let container = gitContainer
         .withWorkdir("/repo")
         .withExec(["git", "init"])
         .withExec(["git", "remote", "add", "origin", repo])
         .withExec(["git", "fetch", "origin", ref])
-        .withExec(["git", "checkout", "FETCH_HEAD"])
-        .directory("/repo");
+        .withExec(["git", "checkout", "FETCH_HEAD"]);
 
-    const r = dir as GitRepo;
+    if (submodules) {
+        container = container
+	    .withExec(["git", "submodule", "update", "--init", "--recursive"]);
+    }
+
+    const r = container.directory("/repo") as GitRepo;
+
     r.repo = repo;
     r.ref = ref;
 
