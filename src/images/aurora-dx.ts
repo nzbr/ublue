@@ -9,7 +9,7 @@ import { commonLayers } from "./common-layers";
 
 export default class AuroraDxImage extends Image {
     name = "aurora-dx";
-    from = "ghcr.io/ublue-os/aurora-dx:stable-43.20260428";
+    from = "ghcr.io/ublue-os/aurora-dx:stable-43.20260501";
 
     layers = [
         ...commonLayers,
