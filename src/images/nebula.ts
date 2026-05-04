@@ -17,7 +17,7 @@ class KernelVersionCheckLayer extends GenericLayer {
 
         KERNEL_VERSION=$(rpm -q kernel --qf '%{VERSION}-%{RELEASE}.%{ARCH}\n')
 
-        if [[ "$KERNEL_VERSION" == 6.18.* ]] || [[ "$KERNEL_VERSION" == 6.19.* ]]; then
+        if [[ "$KERNEL_VERSION" == 6.18.* ]]; then
             echo "Error: Kernel version \${KERNEL_VERSION} is known to be broken on this machine."
             exit 1
         fi
