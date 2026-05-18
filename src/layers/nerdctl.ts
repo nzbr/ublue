@@ -24,7 +24,15 @@ export class NerdctlLayer extends GenericLayer {
             .withFile(
                 "nerdctl.rpm",
                 await mkRPM(buildContainer)(
-                    { name: "nerdctl", version },
+                    {
+                        name: "nerdctl",
+                        version,
+                        requires: [
+                            "containernetworking-plugins",
+                            "iptables",
+                            "iproute",
+                        ],
+                    },
                     content,
                 ),
             );
