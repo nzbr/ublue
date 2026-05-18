@@ -51,7 +51,7 @@ export class Ublue {
         isPr: boolean,
         prNumber: string,
         @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
-    ): Promise<string[][]> {
+    ): Promise<void> {
         const timestamp = new Date().toISOString();
 
         const images = [
@@ -61,7 +61,7 @@ export class Ublue {
             await new NebulaImage(mok, mokPub),
         ];
 
-        return await Promise.all(
+        await Promise.all(
             images.map(async (image) =>
                 image.build().then(async (container) => {
                     container = container.withRegistryAuth(
@@ -118,7 +118,7 @@ export class Ublue {
                             mode: 0o600,
                         });
 
-                    return await Promise.all(
+                    await Promise.all(
                         tags.map(async (tag) => {
                             const digest = await container.publish(
                                 `${registry}/${namespace}/ublue-${image.name}:${tag}`,
@@ -131,7 +131,7 @@ export class Ublue {
                                     "/secrets/cosign.key",
                                     digest,
                                 ])
-                                .stdout();
+                                .sync();
                         }),
                     );
                 }),
