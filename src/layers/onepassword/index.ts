@@ -24,8 +24,24 @@ export class OnepasswordLayer extends GenericLayer {
         "sysusers-onepassword-cli.conf": unindent`
             g onepassword-cli ${GID_ONEPASSWORDCLI}
         `,
+        // Edited to create an empty directory (mountpoint) instead of a symlink.
         "tmpfiles-onepassword.conf": unindent`
-            L  /opt/1Password  -  -  -  -  /usr/lib/1Password
+            d  /var/opt/1Password  -  -  -  -  -
+        `,
+        "var-opt-1Password.mount": unindent`
+            [Unit]
+            Description=Bind mount 1Password from /usr/lib to /opt
+            DefaultDependencies=no
+            Conflicts=umount.target
+            After=systmed-tmpfiles-setup.service
+
+            [Mount]
+            What=/usr/lib/1Password
+            Where=/var/opt/1Password
+            Options=bind
+
+            [Install]
+            WantedBy=local-fs.target
         `,
     };
 
@@ -95,8 +111,15 @@ export class OnepasswordLayer extends GenericLayer {
         rm -f /usr/lib/sysusers.d/30-rpmostree-pkg-group-onepassword.conf
         rm -f /usr/lib/sysusers.d/30-rpmostree-pkg-group-onepassword-cli.conf
 
+
         # Register path symlink
         # We do this via tmpfiles.d so that it is created by the live system.
         cp "/build/tmpfiles-onepassword.conf" /usr/lib/tmpfiles.d/onepassword.conf
+
+        # >>>>> End of blue-build module <<<<<
+
+        # Instead of the symlink created by the blue-build module, we will be using a systemd mount unit.
+        cp "/build/var-opt-1Password.mount" /usr/lib/systemd/system/var-opt-1Password.mount
+        systemctl enable var-opt-1Password.mount
     `;
 }
