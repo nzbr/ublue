@@ -19,5 +19,8 @@ export class CosmicLayer extends GenericLayer {
 
         systemctl disable gdm.service sddm.service || true
         systemctl enable cosmic-greeter.service
+
+        grep 'vt = "1"' /etc/greetd/cosmic-greeter.toml # Check that the option is still set as-is. If not, this might need to be updated.
+        sed -i 's/vt = "1"/vt = "next"/' /etc/greetd/cosmic-greeter.toml
     `;
 }
