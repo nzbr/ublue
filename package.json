@@ -2,7 +2,7 @@
   "type": "module",
   "dependencies": {
     "smol-toml": "^1.6.1",
-    "typescript": "^5.5.4"
+    "typescript": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.0"
