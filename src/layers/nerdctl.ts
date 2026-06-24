@@ -4,7 +4,7 @@ import { fetchGit, GenericLayer, mkRPM } from "../lib";
 export class NerdctlLayer extends GenericLayer {
     name = "nerdctl";
 
-    src = fetchGit("https://github.com/containerd/nerdctl.git", "v2.3.2");
+    src = fetchGit("https://github.com/containerd/nerdctl.git", "v2.3.3");
 
     async build(buildContainer: Container): Promise<Directory> {
         const content = buildContainer
