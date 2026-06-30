@@ -3,7 +3,7 @@ import { commonLayers } from "./common-layers";
 
 export default class BluefinDxImage extends Image {
     name = "bluefin-dx";
-    from = "ghcr.io/ublue-os/bluefin-dx:stable-44.20260623";
+    from = "ghcr.io/ublue-os/bluefin-dx:stable-44.20260630";
 
     layers = [...commonLayers];
 }
