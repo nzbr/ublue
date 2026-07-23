@@ -49,12 +49,11 @@ export class OnepasswordLayer extends GenericLayer {
 
     // Based on https://github.com/blue-build/modules/blob/main/modules/bling/installers/1password.sh
     installScript = `
-        mkdir -p /var/opt
+        mkdir -p /var/opt /var/usrlocal
 
         cp "./1password.repo" /etc/yum.repos.d/1password.repo
         cp "./1password.asc" /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
         rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
-
         dnf install -y 1password 1password-cli
 
         # >>>>> Copied verbatim from the blue-build module <<<<<
@@ -64,7 +63,13 @@ export class OnepasswordLayer extends GenericLayer {
 
         # Create a symlink /usr/bin/1password => /opt/1Password/1password
         rm /usr/bin/1password
+        test -f /usr/lib/1Password/1password # ensure the binary exists
         ln -s /opt/1Password/1password /usr/bin/1password
+
+        # >>>>> BEIGN MODIFICATION <<<<<
+        test -f /usr/lib/1Password/1password-mcp
+        ln -s /opt/1Password/1password-mcp /usr/bin/1password-mcp
+        # >>>>> END MODIFICATION <<<<<
 
         #####
         # The following is a bastardization of "after-install.sh"
