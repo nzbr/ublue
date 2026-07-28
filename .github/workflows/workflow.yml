@@ -20,6 +20,10 @@ jobs:
   dagger:
     runs-on: ubuntu-latest
     steps:
+      - name: Signal build start to healthchecks.io
+        if: github.ref == 'refs/heads/main'
+        run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}/start" || true
+
       - name: Maximize build space
         uses: ublue-os/remove-unwanted-software@v9
 
@@ -58,3 +62,11 @@ jobs:
             --password=env://GITHUB_TOKEN
             --is-pr=${{ github.event_name == 'pull_request' && 'true' || 'false' }}
             --pr-number="${{ github.event.pull_request.number }}"
+
+      - name: Signal build success to healthchecks.io
+        if: success() && github.ref == 'refs/heads/main'
+        run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}"
+
+      - name: Signal build failure to healthchecks.io
+        if: failure() && github.ref == 'refs/heads/main'
+        run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}/fail"
