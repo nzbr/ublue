@@ -61,6 +61,6 @@ export class KdeRoundedCornersLayer extends GenericLayer {
     }
 
     installScript = `
-        dnf install -y ./kde-rounded-corners.rpm
+        dnf install -y -C --disablerepo='*' ./kde-rounded-corners.rpm
     `;
 }

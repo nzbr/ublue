@@ -47,6 +47,6 @@ export class KWinEffectsForceblurLayer extends GenericLayer {
     `;
 
     installScript = `
-        dnf install -y ./build/kwin-better-blur.rpm
+        dnf install -y -C --disablerepo='*' ./build/kwin-better-blur.rpm
     `;
 }

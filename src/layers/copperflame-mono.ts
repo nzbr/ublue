@@ -45,6 +45,6 @@ export class CopperflameMonoLayer extends GenericLayer {
     }
 
     installScript = `
-    dnf install -y ./copperflame-mono.rpm
+    dnf install -y -C --disablerepo='*' ./copperflame-mono.rpm
   `;
 }

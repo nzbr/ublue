@@ -75,7 +75,7 @@ export class LibFprintTodLayer extends GenericLayer {
     }
 
     installScript = `
-        dnf swap -y libfprint $PWD/libfprint.rpm
+        dnf swap -y -C --disablerepo='*' libfprint $PWD/libfprint.rpm
     `;
 }
 
@@ -134,7 +134,7 @@ export class SynatudorLayer extends GenericLayer {
     }
 
     installScript = `
-        dnf install -y $PWD/synatudor.rpm
+        dnf install -y -C --disablerepo='*' $PWD/synatudor.rpm
     `;
 }
 

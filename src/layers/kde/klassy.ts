@@ -76,6 +76,6 @@ export class KlassyLayer extends GenericLayer {
     }
 
     installScript = `
-        dnf install -y ./klassy.rpm
+        dnf install -y -C --disablerepo='*' ./klassy.rpm
     `;
 }
