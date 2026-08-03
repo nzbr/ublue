@@ -33,40 +33,72 @@ jobs:
       - name: Activate Nix environment
         uses: lukas-mertens/switch-into-nix-shell@v1.0.0
 
+      - name: Detect dagger and dagger engine version
+        id: dagger-version
+        run: dagger version | sed -E 's|[^ ]+ ([^ ]+) \(image://([^\)]+)\) [^ ]+|version=\1\nengine-image=\2|' | tee -a $GITHUB_OUTPUT
+
       - name: Decrypt secrets
         run: |
           echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/mok.key ./secrets/mok.key.age
           echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/cosign.key ./secrets/cosign.key.age
 
-      - name: Get dagger vesion
-        id: dagger-version
+      - name: Setup Dagger Engine Cache
+        uses: actions/cache@v6
+        with:
+            path: engine.squashfs
+            key: dagger-engine-${{ steps.dagger-version.outputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
+            restore-keys: dagger-engine-${{ steps.dagger-version.outputs.version }}-
+
+      - name: Unpack Dagger Engine Cache
         run: |
-          dagger version | awk '{print "version="$2;}' >> $GITHUB_OUTPUT
+          sudo mkdir -p /var/lib/dagger
+          if [ -f engine.squashfs ]; then
+            sudo "$(command -v unsquashfs)" -force -dest /var/lib/dagger -xattrs -no-progress engine.squashfs
+            rm -f engine.squashfs
+          fi
+
+      - name: Start Dagger Engine
+        run: >-
+          docker run --rm -d
+          --name dagger-engine
+          --privileged
+          -v "/var/lib/dagger:/var/lib/dagger"
+          -v "$PWD/dagger-engine.json:/etc/dagger/engine.json"
+          "${{ steps.dagger-version.outputs.engine-image }}"
 
       - name: Run Dagger Workflow
-        uses: dagger/dagger-for-github@v8.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
-        with:
-          version: ${{ steps.dagger-version.outputs.version }}
-          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
-          call: >-
-            build-and-push
-            --mok=file://./secrets/mok.key
-            --cosign-key=file://./secrets/cosign.key
-            --revision=${{ github.sha }}
-            --registry=ghcr.io
-            --namespace=${{ github.repository_owner }}
-            --username=${{ github.actor }}
-            --password=env://GITHUB_TOKEN
-            --is-pr=${{ github.event_name == 'pull_request' && 'true' || 'false' }}
-            --pr-number="${{ github.event.pull_request.number }}"
+          _EXPERIMENTAL_DAGGER_RUNNER_HOST: container+docker://dagger-engine
+        run: >-
+          dagger call build-and-push
+          --mok=file://./secrets/mok.key
+          --cosign-key=file://./secrets/cosign.key
+          --revision=${{ github.sha }}
+          --registry=ghcr.io
+          --namespace=${{ github.repository_owner }}
+          --username=${{ github.actor }}
+          --password=env://GITHUB_TOKEN
+          --is-pr=${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+          --pr-number="${{ github.event.pull_request.number }}"
 
       - name: Signal build success to healthchecks.io
         if: success() && github.ref == 'refs/heads/main'
-        run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}"
+        run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}" || true
 
       - name: Signal build failure to healthchecks.io
         if: failure() && github.ref == 'refs/heads/main'
-        run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}/fail"
+        run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}/fail" || true
+
+      - name: Stop Dagger Engine
+        if: always()
+        run: docker stop dagger-engine -t 300
+
+      - name: Pack Dagger Engine Cache
+        if: always()
+        run: |
+          [ -d /var/lib/dagger ] || exit 0
+          sudo "$(command -v mksquashfs)" /var/lib/dagger engine.squashfs \
+            -comp zstd -b 1M -xattrs -noappend -no-progress
+          sudo chown "$(id -u):$(id -g)" engine.squashfs

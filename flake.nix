@@ -25,6 +25,7 @@
         shell.packages = [
           pkgs.rage
           pkgs.ragenix
+          pkgs.squashfsTools
 
           inputs.dagger.packages.${system}.dagger
           pkgs.nodejs
