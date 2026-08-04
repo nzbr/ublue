@@ -26,7 +26,7 @@ class KernelVersionCheckLayer extends GenericLayer {
 
 export default class NebulaImage extends Image {
     name = "nebula";
-    from = new CosmicAtomicImage().build();
+    from = new CosmicAtomicImage();
 
     signingKey: Secret;
     signingKeyPub: File;

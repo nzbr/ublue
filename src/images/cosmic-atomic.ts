@@ -4,7 +4,7 @@ import BluefinDxImage from "./bluefin-dx";
 
 export default class CosmicAtomicImage extends Image {
     name = "cosmic-atomic";
-    from = new BluefinDxImage().build();
+    from = new BluefinDxImage();
 
     layers = [new CosmicLayer()];
 }

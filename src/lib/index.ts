@@ -1,3 +1,4 @@
+export * from "./rechunk";
 export * from "./fetch-tarball";
 export * from "./image";
 export * from "./layer";
