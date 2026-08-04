@@ -23,9 +23,10 @@
 
       perSystem = { pkgs, system, ... }: {
         shell.packages = [
+          pkgs.awscli2
           pkgs.rage
           pkgs.ragenix
-          pkgs.squashfsTools
+          pkgs.zstd
 
           inputs.dagger.packages.${system}.dagger
           pkgs.nodejs

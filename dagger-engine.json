@@ -1,9 +1,7 @@
 {
     "gc": {
         "enabled": true,
-        "maxUsedSpace": "10GB",
-        "reservedSpace": "1GB",
-        "minFreeSpace": "10%",
-        "sweepSize": "10%"
+        "reservedSpace": "75%",
+        "minFreeSpace": "10%"
     }
 }

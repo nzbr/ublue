@@ -19,6 +19,13 @@ permissions:
 jobs:
   dagger:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: "bash -euo pipefail {0}"
+    env:
+      # The AWS_* and S3_* values are deliberately not set here: they are trimmed and
+      # exported by "Configure S3 access", and a job-level env would shadow that.
+      KEY: ublue-dagger-engine.tar.zst
     steps:
       - name: Signal build start to healthchecks.io
         if: github.ref == 'refs/heads/main'
@@ -42,20 +49,48 @@ jobs:
           echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/mok.key ./secrets/mok.key.age
           echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/cosign.key ./secrets/cosign.key.age
 
-      - name: Setup Dagger Engine Cache
-        uses: actions/cache@v6
-        with:
-            path: engine.squashfs
-            key: dagger-engine-${{ steps.dagger-version.outputs.version }}-${{ github.run_id }}-${{ github.run_attempt }}
-            restore-keys: dagger-engine-${{ steps.dagger-version.outputs.version }}-
 
-      - name: Unpack Dagger Engine Cache
+      # A stray newline in a secret is invisible in the UI and surfaces as an unrelated
+      # "Invalid header value" from the signer, so strip whitespace from all of them.
+      # None of these values can legitimately contain any.
+      - name: Configure S3 access
+        env:
+          RAW_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          RAW_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          RAW_AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+          RAW_AWS_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT }}
+          RAW_S3_BUCKET: ${{ secrets.S3_BUCKET }}
         run: |
-          sudo mkdir -p /var/lib/dagger
-          if [ -f engine.squashfs ]; then
-            sudo "$(command -v unsquashfs)" -force -dest /var/lib/dagger -xattrs -no-progress engine.squashfs
-            rm -f engine.squashfs
+          for name in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_DEFAULT_REGION AWS_ENDPOINT_URL S3_BUCKET; do
+            raw="RAW_$name"
+            value=$(printf '%s' "${!raw}" | tr -d '[:space:]')
+            if [ -z "$value" ]; then
+              echo "::error::$name resolves to an empty value"
+              exit 1
+            fi
+            # The registered mask covers the untrimmed secret, which may differ.
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+
+      - name: Restore Dagger Engine Cache
+        continue-on-error: true
+        run: |
+          # Probed separately so a miss doesn't tear down the pipeline below. The error
+          # is echoed rather than swallowed: a bad credential is not a cache miss.
+          if ! size=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$KEY" --query ContentLength --output text 2>&1); then
+            case "$size" in
+              *404*|*"Not Found"*) echo "::notice::No engine cache at s3://$S3_BUCKET/$KEY, starting cold" ;;
+              *) echo "::error::Cannot read s3://$S3_BUCKET/$KEY, starting cold: $size" ;;
+            esac
+            exit 0
           fi
+
+          sudo mkdir -p /var/lib/dagger
+          echo "Restoring $size bytes from s3://$S3_BUCKET/$KEY"
+          aws s3 cp "s3://$S3_BUCKET/$KEY" - \
+            | zstd -d \
+            | sudo tar -x -p --numeric-owner --xattrs --xattrs-include='*' -C /var/lib/dagger
 
       - name: Start Dagger Engine
         run: >-
@@ -95,10 +130,27 @@ jobs:
         if: always()
         run: docker stop dagger-engine -t 300
 
-      - name: Pack Dagger Engine Cache
-        if: always()
+      # Only from main: Don't let PR branches overwrite the cache for everything else
+      - name: Save Dagger Engine Cache
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        continue-on-error: true
         run: |
-          [ -d /var/lib/dagger ] || exit 0
-          sudo "$(command -v mksquashfs)" /var/lib/dagger engine.squashfs \
-            -comp zstd -b 1M -xattrs -noappend -no-progress
-          sudo chown "$(id -u):$(id -g)" engine.squashfs
+          if [ ! -d /var/lib/dagger ]; then
+            echo "::error::/var/lib/dagger does not exist, nothing to save"
+            exit 1
+          fi
+
+          # The upload length is unknown up front, so every part is buffered in memory:
+          # this caps that at concurrency * chunksize.
+          aws configure set default.s3.max_concurrent_requests 8
+          aws configure set default.s3.multipart_chunksize 64MB
+
+          sudo tar -c --numeric-owner --xattrs --xattrs-include='*' --sparse -C /var/lib/dagger . \
+            | zstd -T0 -8 \
+            | aws s3 cp - "s3://$S3_BUCKET/$KEY" --only-show-errors
+
+          # `aws s3 cp` can report a transfer error and still exit 0, so the upload is
+          # only confirmed by reading the object back. Assigned rather than inlined
+          # into echo, which would discard the exit status.
+          size=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$KEY" --query ContentLength --output text)
+          echo "Uploaded $size bytes to s3://$S3_BUCKET/$KEY"
