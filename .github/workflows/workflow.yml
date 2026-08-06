@@ -102,21 +102,25 @@ jobs:
           "${{ steps.dagger-version.outputs.engine-image }}"
 
       - name: Run Dagger Workflow
+        uses: dagger/dagger-for-github@v8.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
           _EXPERIMENTAL_DAGGER_RUNNER_HOST: container+docker://dagger-engine
-        run: >-
-          dagger call build-and-push
-          --mok=file://./secrets/mok.key
-          --cosign-key=file://./secrets/cosign.key
-          --revision=${{ github.sha }}
-          --registry=ghcr.io
-          --namespace=${{ github.repository_owner }}
-          --username=${{ github.actor }}
-          --password=env://GITHUB_TOKEN
-          --is-pr=${{ github.event_name == 'pull_request' && 'true' || 'false' }}
-          --pr-number="${{ github.event.pull_request.number }}"
+        with:
+          version: ${{ steps.dagger-version.outputs.version }}
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          call: >-
+            build-and-push
+            --mok=file://./secrets/mok.key
+            --cosign-key=file://./secrets/cosign.key
+            --revision=${{ github.sha }}
+            --registry=ghcr.io
+            --namespace=${{ github.repository_owner }}
+            --username=${{ github.actor }}
+            --password=env://GITHUB_TOKEN
+            --is-pr=${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+            --pr-number="${{ github.event.pull_request.number }}"
 
       - name: Signal build success to healthchecks.io
         if: success() && github.ref == 'refs/heads/main'
