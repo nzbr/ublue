@@ -6,8 +6,12 @@ export interface MkRpmArgs {
     version: string;
     arch?: string;
     license?: string;
+    summary?: string;
+    url?: string;
     description?: string;
     requires?: string[];
+    provides?: string[];
+    post?: string;
 
     specfile?: string;
 }
@@ -23,30 +27,35 @@ export const mkRPM =
         const specfile =
             args.specfile ??
             unindent`
-        AutoReqProv: no
+                AutoReqProv: no
 
-        Name: ${args.name}
-        Version: ${args.version}
-        Release: 1%{?dist}
-        BuildArch: ${args.arch}
-        Summary: ${args.name}
-        License: ${args.license ?? "Unknown"}
-        ${args.requires ? `Requires: ${args.requires.join(", ")}` : ""}
+                Name: ${args.name}
+                Version: ${args.version}
+                Release: 1%{?dist}
+                BuildArch: ${args.arch}
+                Summary: ${args.summary ?? args.name}
+                License: ${args.license ?? "Unknown"}
+                ${args.url ? `URL: ${args.url}` : ""}
+                ${args.requires ? `Requires: ${args.requires.join(", ")}` : ""}
+                ${args.provides ? `Provides: ${args.provides.join(", ")}` : ""}
 
-        %description
-        ${args.description ?? args.name}
+                %description
+                ${args.description ?? args.name}
 
-        %install
-        export QA_RPATHS=0x0030
-        rm -rf $RPM_BUILD_ROOT
-        mkdir -p $RPM_BUILD_ROOT
-        cp -vr %{_sourcedir}/${args.name}/. $RPM_BUILD_ROOT
+                %install
+                export QA_RPATHS=0x0030
+                rm -rf $RPM_BUILD_ROOT
+                mkdir -p $RPM_BUILD_ROOT
+                cp -vr %{_sourcedir}/${args.name}/. $RPM_BUILD_ROOT
 
-        %clean
-        rm -rf $RPM_BUILD_ROOT
-
-        %files
-    `;
+                %clean
+                rm -rf $RPM_BUILD_ROOT
+            ` +
+                (args.post
+                    ? `\n%post\n${args.post.replace(/\n+$/, "")}\n`
+                    : "") +
+                // Last, so the file list can be appended to it below.
+                "\n%files\n";
 
         const workspace = dag
             .directory()
