@@ -106,14 +106,14 @@ export class OnepasswordLayer extends GenericLayer {
             "1password.rpm",
             await mkRPM(buildContainer)(
                 {
-                    name: "1password",
+                    name: "1password-repack",
                     version: (await metaVersion).trim(),
                     license: (await metaLicense).trim(),
                     summary: (await metaSummary).trim(),
                     url: (await metaUrl).trim(),
                     description: (await metaSummary).trim(),
                     // The CLI is folded in, so claim what it used to provide.
-                    provides: [`1password-cli = ${(await metaCliVersion).trim()}`],
+                    provides: [`1password = ${(await metaVersion).trim()}`, `1password-cli = ${(await metaCliVersion).trim()}`],
                     requires: (await metaRequires).split("\n").filter((it) => it.trim()),
                     post: await metaPost,
                 },
