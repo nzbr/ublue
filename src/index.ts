@@ -12,6 +12,7 @@ import AuroraDxImage from "./images/aurora-dx";
 import NebulaImage from "./images/nebula";
 import CosmicAtomicImage from "./images/cosmic-atomic";
 import { pushChunked } from "./lib";
+import { Image } from "./lib/image";
 
 @object()
 export class Ublue {
@@ -41,6 +42,33 @@ export class Ublue {
     }
 
     @func()
+    getImages(
+        mok: Secret,
+        @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
+    ): Promise<Image[]> {
+        return Promise.all([
+            // new AuroraDxImage(),
+            new BluefinDxImage(),
+            new CosmicAtomicImage(),
+            new NebulaImage(mok, mokPub),
+        ]);
+    }
+
+    @func()
+    async build(
+        mok: Secret,
+        @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
+    ): Promise<Container[]> {
+        return this.getImages(mok, mokPub).then((images) =>
+            Promise.all(
+                images.map((image) =>
+                    image.build().then((it) => it.sync()),
+                ),
+            ),
+        );
+    }
+
+    @func()
     async buildAndPush(
         registry: string,
         namespace: string,
@@ -53,14 +81,9 @@ export class Ublue {
         prNumber: string,
         @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
     ): Promise<void> {
-        const timestamp = new Date().toISOString();
+        const images = await this.getImages(mok, mokPub);
 
-        const images = [
-            // await new AuroraDxImage(),
-            await new BluefinDxImage(),
-            await new CosmicAtomicImage(),
-            await new NebulaImage(mok, mokPub),
-        ];
+        const timestamp = new Date().toISOString();
 
         let cosignContainer = dag
             .container()
@@ -94,7 +117,8 @@ export class Ublue {
                 };
 
                 const container = Object.entries(labels).reduce(
-                    (container, [key, value]) => container.withLabel(key, value),
+                    (container, [key, value]) =>
+                        container.withLabel(key, value),
                     await image.build(),
                 );
 

@@ -49,7 +49,6 @@ jobs:
           echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/mok.key ./secrets/mok.key.age
           echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/cosign.key ./secrets/cosign.key.age
 
-
       # A stray newline in a secret is invisible in the UI and surfaces as an unrelated
       # "Invalid header value" from the signer, so strip whitespace from all of them.
       # None of these values can legitimately contain any.
@@ -94,14 +93,63 @@ jobs:
 
       - name: Start Dagger Engine
         run: >-
-          docker run --rm -d
+          docker run -d
           --name dagger-engine
           --privileged
           -v "/var/lib/dagger:/var/lib/dagger"
           -v "$PWD/dagger-engine.json:/etc/dagger/engine.json"
           "${{ steps.dagger-version.outputs.engine-image }}"
 
-      - name: Run Dagger Workflow
+      - name: Run Dagger Build
+        uses: dagger/dagger-for-github@v8.4.1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          _EXPERIMENTAL_DAGGER_RUNNER_HOST: container+docker://dagger-engine
+        with:
+          version: ${{ steps.dagger-version.outputs.version }}
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          call: >-
+            build
+            --mok=file://./secrets/mok.key
+
+      - name: Stop Dagger Engine
+        if: always()
+        run: docker stop dagger-engine -t 300
+
+      # Only from main: Don't let PR branches overwrite the cache for everything else
+      - name: Save Dagger Engine Cache
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        continue-on-error: true
+        run: |
+          if [ ! -d /var/lib/dagger ]; then
+            echo "::error::/var/lib/dagger does not exist, nothing to save"
+            exit 1
+          fi
+
+          # zstd gets 3.5x on snapshots and 1.008x on content, so the ratio of the two
+          # is what decides how big the upload is. One walk, reported in MB.
+          sudo du -sm /var/lib/dagger/worker/content /var/lib/dagger/worker/snapshots
+
+          # The upload length is unknown up front, so every part is buffered in memory:
+          # this caps that at concurrency * chunksize.
+          aws configure set default.s3.max_concurrent_requests 16
+          aws configure set default.s3.multipart_chunksize 64MB
+
+          sudo tar -c --numeric-owner --xattrs --xattrs-include='*' --sparse -C /var/lib/dagger . \
+            | zstd -T0 -3 \
+            | aws s3 cp - "s3://$S3_BUCKET/$KEY" --only-show-errors
+
+          # `aws s3 cp` can report a transfer error and still exit 0, so the upload is
+          # only confirmed by reading the object back. Assigned rather than inlined
+          # into echo, which would discard the exit status.
+          size=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$KEY" --query ContentLength --output text)
+          echo "Uploaded $size bytes to s3://$S3_BUCKET/$KEY"
+
+      - name: Start Dagger Engine
+        run: docker start dagger-engine
+
+      - name: Run Dagger Push
         uses: dagger/dagger-for-github@v8.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -129,32 +177,3 @@ jobs:
       - name: Signal build failure to healthchecks.io
         if: failure() && github.ref == 'refs/heads/main'
         run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}/fail" || true
-
-      - name: Stop Dagger Engine
-        if: always()
-        run: docker stop dagger-engine -t 300
-
-      # Only from main: Don't let PR branches overwrite the cache for everything else
-      - name: Save Dagger Engine Cache
-        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
-        continue-on-error: true
-        run: |
-          if [ ! -d /var/lib/dagger ]; then
-            echo "::error::/var/lib/dagger does not exist, nothing to save"
-            exit 1
-          fi
-
-          # The upload length is unknown up front, so every part is buffered in memory:
-          # this caps that at concurrency * chunksize.
-          aws configure set default.s3.max_concurrent_requests 8
-          aws configure set default.s3.multipart_chunksize 64MB
-
-          sudo tar -c --numeric-owner --xattrs --xattrs-include='*' --sparse -C /var/lib/dagger . \
-            | zstd -T0 -8 \
-            | aws s3 cp - "s3://$S3_BUCKET/$KEY" --only-show-errors
-
-          # `aws s3 cp` can report a transfer error and still exit 0, so the upload is
-          # only confirmed by reading the object back. Assigned rather than inlined
-          # into echo, which would discard the exit status.
-          size=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$KEY" --query ContentLength --output text)
-          echo "Uploaded $size bytes to s3://$S3_BUCKET/$KEY"
