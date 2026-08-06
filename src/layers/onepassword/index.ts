@@ -43,7 +43,7 @@ export class OnepasswordLayer extends GenericLayer {
                 {
                     rpm -qp --qf '[%{REQUIRENAME}\n]' "/rpms/app.rpm"
                     rpm -qp --qf '[%{REQUIRENAME}\n]' "/rpms/cli.rpm"
-                } | grep -vE '^(rpmlib\(|/bin/sh$)' | sort -u
+                } | grep -vE '^(rpmlib\\(|/bin/sh$)' | sort -u
             `]).stdout();
         const metaPost = rpms.withExec(["bash", "-euo", "pipefail", "-c", unindent`
                 rpm -qp --qf '%{POSTIN}' "/rpms/app.rpm" > /tmp/post-app.sh
@@ -63,8 +63,8 @@ export class OnepasswordLayer extends GenericLayer {
 
         const contents = rpms
             .withDirectory("/out", dag.directory())
-            .withExec(["bash", "-euo", "pipefail", "-c", "cat /rpms/app.rpm | rpm2archive - tar -xz -C /out"])
-            .withExec(["bash", "-euo", "pipefail", "-c", "cat /rpms/cli.rpm | rpm2archive - tar -xz -C /out"])
+            .withExec(["bash", "-euo", "pipefail", "-c", "cat /rpms/app.rpm | rpm2archive - | tar -xz -C /out"])
+            .withExec(["bash", "-euo", "pipefail", "-c", "cat /rpms/cli.rpm | rpm2archive - | tar -xz -C /out"])
             .withExec(["mv", "/out/opt/1Password", "/out/usr/lib/1Password"])
             .withExec(["rmdir", "/out/opt"])
             .withExec(["rm", "-rf", "/out/usr/lib/.build-id"])
