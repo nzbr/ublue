@@ -24,10 +24,14 @@ export class OnepasswordLayer extends GenericLayer {
             .withExec(["rpm", "--import", "/etc/pki/rpm-gpg/RPM-GPG-KEY-1password"])
             .withDirectory("/tmp/rpms", dag.directory())
             .withExec(["dnf", "download", "-y", "--destdir=/tmp/rpms", "1password", "1password-cli"])
-            .withExec(["rpm", "-K", "/tmp/rpms/*.rpm"], {useEntrypoint: true})
             .withDirectory("/rpms", dag.directory())
-            .withExec(["mv", "/tmp/rpms/1password-cli-*.rpm", "/rpms/cli.rpm"], {useEntrypoint: true})
-            .withExec(["mv", "/tmp/rpms/1password*.rpm", "/rpms/app.rpm"], {useEntrypoint: true});
+            .withExec(["bash", "-euo", "pipefail", "-c", unindent`
+                # dnf download verifies nothing by itself
+                rpm -K /tmp/rpms/*.rpm
+
+                mv /tmp/rpms/1password-cli-*.rpm /rpms/cli.rpm
+                mv /tmp/rpms/1password-[0-9]*.rpm /rpms/app.rpm
+            `]);
 
         const metaVersion = rpms.withExec(["rpm", "-qp", "--qf", "%{VERSION}", "/rpms/app.rpm"]).stdout();
         const metaCliVersion = rpms.withExec(["rpm", "-qp", "--qf", "%{VERSION}", "/rpms/cli.rpm"]).stdout();
