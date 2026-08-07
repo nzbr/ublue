@@ -41,7 +41,6 @@ export class Ublue {
         return new NebulaImage(signingKey, signingKeyPub).build();
     }
 
-    @func()
     getImages(
         mok: Secret,
         @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
