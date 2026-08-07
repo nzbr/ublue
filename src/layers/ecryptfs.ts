@@ -1,9 +1,17 @@
-import { GenericLayer } from "../lib";
+import { GenericLayer, unindent } from "../lib";
 
 export class EcryptfsLayer extends GenericLayer {
     name = "ecryptfs";
 
+    extraFiles = {
+        "00-ecryptfs.conf": unindent`
+            g ecryptfs 400
+        `,
+    }
+
     installScript = `
+        install -m644 00-ecryptfs.conf /usr/lib/sysusers.d/00-ecryptfs.conf
+
         dnf install -y ecryptfs-utils ecryptfs-utils-loginmount
         authselect enable-feature with-ecryptfs
         authselect enable-feature with-pamaccess

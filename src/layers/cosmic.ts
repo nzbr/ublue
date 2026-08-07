@@ -1,9 +1,18 @@
-import { GenericLayer } from "../lib";
+import { GenericLayer, unindent } from "../lib";
 
 export class CosmicLayer extends GenericLayer {
     name = "cosmic";
 
+    extraFiles = {
+        "00-cosmic.conf": unindent`
+            g cosmic-greeter 401
+            g greetd 402
+        `,
+    };
+
     installScript = `
+        install -m644 00-cosmic.conf /usr/lib/sysusers.d/00-cosmic.conf
+
         dnf copr enable -y ryanabx/cosmic-epoch
 
         dnf install -y \
