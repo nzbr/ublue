@@ -35,10 +35,10 @@ export class Ublue {
 
     @func()
     nebula(
-        signingKey: Secret,
-        @argument({ defaultPath: "/secrets/mok.pub" }) signingKeyPub: File,
+        mok: Secret,
+        @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
     ): Promise<Container> {
-        return new NebulaImage(signingKey, signingKeyPub).build();
+        return new NebulaImage(mok, mokPub).build();
     }
 
     getImages(
