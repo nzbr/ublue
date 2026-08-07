@@ -4,13 +4,14 @@ export class RpmOstreeTweaksLayer extends GenericLayer {
     name = "rpm-ostree-tweaks";
 
     extraFiles = {
+        // Re-enable local layering. It is sometimes handy for testing
         "rpm-ostreed.conf": `
             # Entries in this file show the compile time defaults.
             # You can change settings by editing this file.
             # For option meanings, see rpm-ostreed.conf(5).
 
             [Daemon]
-            AutomaticUpdatePolicy=check
+            AutomaticUpdatePolicy=stage
 
             ##########
             # NOTE: This will be set to true by default in Spring 2025
@@ -21,8 +22,9 @@ export class RpmOstreeTweaksLayer extends GenericLayer {
             #
             # See [future link] for more information
             ##########
-            # LockLayering=false
+            LockLayering=false
         `,
+        // Allows updating without sudo
         "org.projectatomic.rpmostree1.rules": `
             polkit.addRule(function(action, subject) {
                 if ((action.id == "org.projectatomic.rpmostree1.repo-refresh" ||
@@ -38,12 +40,7 @@ export class RpmOstreeTweaksLayer extends GenericLayer {
     installScript = `
         set -euxo pipefail
 
-        # Disable universal-blue update, use rpm-ostreed-automatic instead
-        systemctl disable uupd.timer
-        systemctl enable rpm-ostreed-automatic.timer
-
         mv rpm-ostreed.conf /etc/
-
         mv org.projectatomic.rpmostree1.rules /etc/polkit-1/rules.d/
 
         # TODO: Enforce image signatures through /etc/containers/policy.json
