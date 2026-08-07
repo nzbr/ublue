@@ -6,7 +6,7 @@ export class LibFprintTodLayer extends GenericLayer {
 
     src = fetchGit(
         "https://gitlab.freedesktop.org/3v1n0/libfprint.git",
-        "v1.95.1+tod1",
+        "v1.95.2+tod1",
     );
 
     async build(buildContainer: Container): Promise<Directory> {
