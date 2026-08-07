@@ -86,7 +86,7 @@ jobs:
           fi
 
           sudo mkdir -p /var/lib/dagger
-          echo "Restoring $size bytes from s3://$S3_BUCKET/$KEY"
+          echo "Restoring $(numfmt --to=iec-i --suffix=B --format='%.1f' "$size") from s3://$S3_BUCKET/$KEY"
           aws s3 cp "s3://$S3_BUCKET/$KEY" - \
             | zstd -d \
             | sudo tar -x -p --numeric-owner --xattrs --xattrs-include='*' -C /var/lib/dagger
@@ -129,7 +129,7 @@ jobs:
 
           # zstd gets 3.5x on snapshots and 1.008x on content, so the ratio of the two
           # is what decides how big the upload is. One walk, reported in MB.
-          sudo du -sm /var/lib/dagger/worker/content /var/lib/dagger/worker/snapshots
+          sudo du -sch /var/lib/dagger/worker/content /var/lib/dagger/worker/snapshots
 
           # The upload length is unknown up front, so every part is buffered in memory:
           # this caps that at concurrency * chunksize.
@@ -137,19 +137,21 @@ jobs:
           aws configure set default.s3.multipart_chunksize 64MB
 
           sudo tar -c --numeric-owner --xattrs --xattrs-include='*' --sparse -C /var/lib/dagger . \
-            | zstd -T0 -3 \
+            | zstd -T0 \
             | aws s3 cp - "s3://$S3_BUCKET/$KEY" --only-show-errors
 
           # `aws s3 cp` can report a transfer error and still exit 0, so the upload is
           # only confirmed by reading the object back. Assigned rather than inlined
           # into echo, which would discard the exit status.
           size=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$KEY" --query ContentLength --output text)
-          echo "Uploaded $size bytes to s3://$S3_BUCKET/$KEY"
+          echo "Uploaded $(numfmt --to=iec-i --suffix=B --format='%.1f' "$size") to s3://$S3_BUCKET/$KEY"
 
       - name: Start Dagger Engine
+        if: success() && github.ref == 'refs/heads/main'
         run: docker start dagger-engine
 
       - name: Run Dagger Push
+        if: success() && github.ref == 'refs/heads/main'
         uses: dagger/dagger-for-github@v8.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
