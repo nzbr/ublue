@@ -8,7 +8,7 @@ export * from "./kde/klassy";
 export * from "./kde/kwin-effects-forceblur";
 export * from "./motorcomm-yt6801";
 export * from "./nerdctl";
-export * from "./nix-mountpoint";
+export * from "./nix";
 export * from "./no-flatpak-auto-update";
 export * from "./onepassword";
 export * from "./rpm-ostree-tweaks";

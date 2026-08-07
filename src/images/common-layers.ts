@@ -1,6 +1,6 @@
 import {
     CopperflameMonoLayer,
-    NixMountpointLayer,
+    NixLayer,
     NoFlatpakAutoUpdateLayer,
     RpmOstreeTweaksLayer,
     SudoTweaksLayer,
@@ -10,6 +10,6 @@ export const commonLayers = [
     new RpmOstreeTweaksLayer(),
     new NoFlatpakAutoUpdateLayer(),
     new SudoTweaksLayer(),
-    new NixMountpointLayer(),
+    new NixLayer(),
     new CopperflameMonoLayer(),
 ];
