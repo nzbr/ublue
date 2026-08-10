@@ -17,13 +17,13 @@ export abstract class GenericLayer implements Layer {
 
     src = dag.directory();
 
-    extraFiles: { [key: string]: string } = {};
+    extraFiles: { [key: string]: string | Promise<string> } = {};
 
     async build(buildContainer: Container): Promise<Directory> {
         let buildDir = this.src;
 
         for (const [key, value] of Object.entries(this.extraFiles)) {
-            buildDir = buildDir.withNewFile(key, unindent(value), {
+            buildDir = buildDir.withNewFile(key, unindent(await value), {
                 permissions: 0o755,
             });
         }

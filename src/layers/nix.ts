@@ -1,12 +1,43 @@
-import { GenericLayer, unindent } from "../lib";
+import { fetchGit, GenericLayer, unindent } from "../lib";
 
 export class NixLayer extends GenericLayer {
     name = "nix";
 
+    src = fetchGit(
+        "https://github.com/DeterminateSystems/nix-installer.git",
+        "v3.21.9",
+    ).directory("src/action/linux/selinux");
+
+    // mirrors upstream's build.sh
+    buildScript = `
+        dnf install -y checkpolicy policycoreutils
+
+        checkmodule -M -m -c 5 -o nix.mod nix.te
+        semodule_package -o nix.pp -m nix.mod -f nix.fc
+    `;
+
     extraFiles = {
-        "nix-directory.service": unindent`
+        "nix-store-setup": unindent`
+            #!/usr/bin/env bash
+            set -euo pipefail
+
+            mkdir -p /var/home/nix/var/nix/daemon-socket
+
+            selinuxenabled || exit 0
+
+            policy=/usr/share/selinux/packages/nix.pp
+            stamp=/var/lib/nix-selinux/policy.pp
+
+            if [[ ! -e $stamp ]] || ! cmp -s "$policy" "$stamp"; then
+                semodule --install "$policy"
+                install -Dm644 "$policy" "$stamp"
+            fi
+
+            chcon "$(matchpathcon -n /nix/var/nix/daemon-socket)" /var/home/nix/var/nix/daemon-socket
+        `,
+        "nix-store-setup.service": unindent`
             [Unit]
-            Description=Ensure /var/home/nix exists
+            Description=Set up the nix store
             DefaultDependencies=no
             After=local-fs.target
             Before=nix.mount
@@ -16,7 +47,7 @@ export class NixLayer extends GenericLayer {
             [Service]
             Type=oneshot
             RemainAfterExit=yes
-            ExecStart=/usr/bin/mkdir -p /var/home/nix
+            ExecStart=/usr/libexec/nix-store-setup
 
             [Install]
             RequiredBy=nix.mount
@@ -29,9 +60,9 @@ export class NixLayer extends GenericLayer {
             [Unit]
             Description=Mount /var/home/nix on /nix
             PropagatesStopTo=nix-daemon.service
-            PropagatesStopTo=nix-directory.service
-            After=nix-directory.service
-            Requires=nix-directory.service
+            PropagatesStopTo=nix-store-setup.service
+            After=nix-store-setup.service
+            Requires=nix-store-setup.service
             Before=nix-daemon.service
             Before=nix-daemon.socket
             Before=systemd-tmpfiles-setup.service
@@ -61,8 +92,10 @@ export class NixLayer extends GenericLayer {
 
         rm -rf /nix
         mkdir -p /nix
-        install -m644 nix-directory.service /usr/lib/systemd/system/nix-directory.service
         install -m644 nix.mount /usr/lib/systemd/system/nix.mount
-        systemctl enable nix-directory.service nix.mount nix-daemon.socket
+        install -m644 nix-store-setup.service /usr/lib/systemd/system/nix-store-setup.service
+        install -Dm644 nix.pp /usr/share/selinux/packages/nix.pp
+        install -m755 nix-store-setup /usr/libexec/nix-store-setup
+        systemctl enable nix.mount nix-store-setup.service nix-daemon.socket
     `;
 }
