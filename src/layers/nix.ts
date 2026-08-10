@@ -7,10 +7,15 @@ export class NixLayer extends GenericLayer {
         "nix-directory.service": unindent`
             [Unit]
             Description=Ensure /var/home/nix exists
+            DefaultDependencies=no
             After=local-fs.target
+            Before=nix.mount
+            Conflicts=shutdown.target
+            Before=shutdown.target
 
             [Service]
-            Type=Oneshot
+            Type=oneshot
+            RemainAfterExit=yes
             ExecStart=/usr/bin/mkdir -p /var/home/nix
 
             [Install]
@@ -27,6 +32,9 @@ export class NixLayer extends GenericLayer {
             PropagatesStopTo=nix-directory.service
             After=nix-directory.service
             Requires=nix-directory.service
+            Before=nix-daemon.service
+            Before=nix-daemon.socket
+            Before=systemd-tmpfiles-setup.service
             ConditionPathIsDirectory=/nix
             DefaultDependencies=no
 
@@ -55,6 +63,6 @@ export class NixLayer extends GenericLayer {
         mkdir -p /nix
         install -m644 nix-directory.service /usr/lib/systemd/system/nix-directory.service
         install -m644 nix.mount /usr/lib/systemd/system/nix.mount
-        systemctl enable nix-directory.service nix.mount
+        systemctl enable nix-directory.service nix.mount nix-daemon.socket
     `;
 }
