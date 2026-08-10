@@ -16,6 +16,10 @@ export class NixLayer extends GenericLayer {
             [Install]
             RequiredBy=nix.mount
         `,
+        "nix.conf.append": unindent`
+
+            !include nix.custom.conf
+        `,
         "nix.mount": unindent`
             [Unit]
             Description=Mount /var/home/nix on /nix
@@ -44,6 +48,8 @@ export class NixLayer extends GenericLayer {
         dnf install -y \
             nix \
             nix-legacy
+
+        cat nix.conf.append >>/etc/nix/nix.conf
 
         rm -rf /nix
         mkdir -p /nix
