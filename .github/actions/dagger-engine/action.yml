@@ -107,6 +107,12 @@ runs:
           sudo rm -rf /var/lib/dagger
         fi
 
+        # What is left here is what a rechunk has to fit into, and it is the first number
+        # to look at when one runs out of space.
+        df -h /
+
+    # The engine's garbage collection is what keeps the restored cache from crowding out
+    # the rechunk, so the limits in dagger-engine.json are load-bearing for the push jobs.
     - name: Start Dagger Engine
       shell: bash
       run: >-
