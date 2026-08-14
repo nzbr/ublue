@@ -53,6 +53,19 @@ export class Ublue {
         ]);
     }
 
+    /**
+     * The names of the images that {@link build} builds, as a JSON array. CI reads this
+     * to fan {@link buildAndPush} out over one runner per image.
+     */
+    @func()
+    async imageNames(
+        mok: Secret,
+        @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
+    ): Promise<string> {
+        const images = await this.getImages(mok, mokPub);
+        return JSON.stringify(images.map((image) => image.name));
+    }
+
     @func()
     async build(
         mok: Secret,
@@ -79,8 +92,20 @@ export class Ublue {
         isPr: boolean,
         prNumber: string,
         @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
+        /** Push only this one image. Empty pushes all of them. */
+        imageName = "",
     ): Promise<void> {
-        const images = await this.getImages(mok, mokPub);
+        const allImages = await this.getImages(mok, mokPub);
+        const images = imageName
+            ? allImages.filter((image) => image.name === imageName)
+            : allImages;
+        if (images.length === 0) {
+            throw new Error(
+                `No image named "${imageName}". Known images: ${allImages
+                    .map((image) => image.name)
+                    .join(", ")}`,
+            );
+        }
 
         const timestamp = new Date().toISOString();
 

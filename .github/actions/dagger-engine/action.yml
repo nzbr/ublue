@@ -1,0 +1,118 @@
+name: Dagger engine
+description: >-
+  Prepare a runner for calling into the dagger module: free up disk space, enter the nix
+  environment, decrypt the signing keys and start an engine seeded with the cache archive
+  from S3.
+
+inputs:
+  age-key:
+    description: The identity the secrets in ./secrets are encrypted to.
+    required: true
+  aws-access-key-id:
+    description: Access key for the bucket holding the engine cache.
+    required: true
+  aws-secret-access-key:
+    description: Secret key for the bucket holding the engine cache.
+    required: true
+  aws-region:
+    description: Region of the bucket holding the engine cache.
+    required: true
+  s3-endpoint:
+    description: Endpoint URL of the bucket holding the engine cache.
+    required: true
+  s3-bucket:
+    description: Name of the bucket holding the engine cache.
+    required: true
+
+outputs:
+  dagger-version:
+    description: Version of the dagger CLI in the nix environment, for dagger-for-github.
+    value: ${{ steps.dagger-version.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Maximize build space
+      uses: ublue-os/remove-unwanted-software@v9
+
+    - name: Activate Nix environment
+      uses: lukas-mertens/switch-into-nix-shell@v1.0.0
+
+    - name: Detect dagger and dagger engine version
+      id: dagger-version
+      shell: bash
+      run: dagger version | sed -E 's|[^ ]+ ([^ ]+) \(image://([^\)]+)\) [^ ]+|version=\1\nengine-image=\2|' | tee -a $GITHUB_OUTPUT
+
+    - name: Decrypt secrets
+      shell: bash
+      env:
+        AGE_KEY: ${{ inputs.age-key }}
+      run: |
+        echo "$AGE_KEY" | rage -d -i - -o ./secrets/mok.key ./secrets/mok.key.age
+        echo "$AGE_KEY" | rage -d -i - -o ./secrets/cosign.key ./secrets/cosign.key.age
+
+    # A stray newline in a secret is invisible in the UI and surfaces as an unrelated
+    # "Invalid header value" from the signer, so strip whitespace from all of them.
+    # None of these values can legitimately contain any.
+    - name: Configure S3 access
+      shell: bash
+      env:
+        RAW_AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        RAW_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+        RAW_AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
+        RAW_AWS_ENDPOINT_URL: ${{ inputs.s3-endpoint }}
+        RAW_S3_BUCKET: ${{ inputs.s3-bucket }}
+      run: |
+        # The trimmed values go to GITHUB_ENV, so a job that sets any of these names in
+        # its own env block would shadow them again.
+        for name in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_DEFAULT_REGION AWS_ENDPOINT_URL S3_BUCKET; do
+          raw="RAW_$name"
+          value=$(printf '%s' "${!raw}" | tr -d '[:space:]')
+          if [ -z "$value" ]; then
+            echo "::error::$name resolves to an empty value"
+            exit 1
+          fi
+          # The registered mask covers the untrimmed secret, which may differ.
+          echo "::add-mask::$value"
+          echo "$name=$value" >> "$GITHUB_ENV"
+        done
+
+        # Every job reads and writes this one object: a copy per run or per job would
+        # multiply the storage bill, and a job that rechunks wants exactly the cache its
+        # build job uploaded. Exported so the caller saves where this restored from.
+        echo "KEY=ublue-dagger-engine.tar.zst" >> "$GITHUB_ENV"
+
+    - name: Restore Dagger Engine Cache
+      shell: bash
+      run: |
+        # Probed separately so a miss doesn't tear down the pipeline below. The error
+        # is echoed rather than swallowed: a bad credential is not a cache miss.
+        if ! size=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$KEY" --query ContentLength --output text 2>&1); then
+          case "$size" in
+            *404*|*"Not Found"*) echo "::notice::No engine cache at s3://$S3_BUCKET/$KEY, starting cold" ;;
+            *) echo "::error::Cannot read s3://$S3_BUCKET/$KEY, starting cold: $size" ;;
+          esac
+          exit 0
+        fi
+
+        sudo mkdir -p /var/lib/dagger
+        echo "Restoring $(numfmt --to=iec-i --suffix=B --format='%.1f' "$size") from s3://$S3_BUCKET/$KEY"
+        if ! aws s3 cp "s3://$S3_BUCKET/$KEY" - \
+          | zstd -d \
+          | sudo tar -x -p --numeric-owner --xattrs --xattrs-include='*' -C /var/lib/dagger; then
+          # Steps of a composite action cannot continue-on-error, and what a broken
+          # transfer leaves behind is worse than nothing: the engine would come up on a
+          # truncated snapshot database.
+          echo "::warning::Restoring s3://$S3_BUCKET/$KEY failed, starting cold"
+          sudo rm -rf /var/lib/dagger
+        fi
+
+    - name: Start Dagger Engine
+      shell: bash
+      run: >-
+        docker run -d
+        --name dagger-engine
+        --privileged
+        -v "/var/lib/dagger:/var/lib/dagger"
+        -v "${{ github.workspace }}/dagger-engine.json:/etc/dagger/engine.json"
+        "${{ steps.dagger-version.outputs.engine-image }}"

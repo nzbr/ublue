@@ -16,89 +16,35 @@ concurrency:
 permissions:
   packages: write
 
+defaults:
+  run:
+    shell: "bash -euo pipefail {0}"
+
 jobs:
-  dagger:
+  build:
+    name: Build all images
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: "bash -euo pipefail {0}"
-    env:
-      # The AWS_* and S3_* values are deliberately not set here: they are trimmed and
-      # exported by "Configure S3 access", and a job-level env would shadow that.
-      KEY: ublue-dagger-engine.tar.zst
+    outputs:
+      images: ${{ steps.images.outputs.images }}
     steps:
       - name: Signal build start to healthchecks.io
         if: github.ref == 'refs/heads/main'
         run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}/start" || true
 
-      - name: Maximize build space
-        uses: ublue-os/remove-unwanted-software@v9
 
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Activate Nix environment
-        uses: lukas-mertens/switch-into-nix-shell@v1.0.0
-
-      - name: Detect dagger and dagger engine version
-        id: dagger-version
-        run: dagger version | sed -E 's|[^ ]+ ([^ ]+) \(image://([^\)]+)\) [^ ]+|version=\1\nengine-image=\2|' | tee -a $GITHUB_OUTPUT
-
-      - name: Decrypt secrets
-        run: |
-          echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/mok.key ./secrets/mok.key.age
-          echo ${{ secrets.AGE_KEY }} | rage -d -i - -o ./secrets/cosign.key ./secrets/cosign.key.age
-
-      # A stray newline in a secret is invisible in the UI and surfaces as an unrelated
-      # "Invalid header value" from the signer, so strip whitespace from all of them.
-      # None of these values can legitimately contain any.
-      - name: Configure S3 access
-        env:
-          RAW_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          RAW_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          RAW_AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
-          RAW_AWS_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT }}
-          RAW_S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        run: |
-          for name in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_DEFAULT_REGION AWS_ENDPOINT_URL S3_BUCKET; do
-            raw="RAW_$name"
-            value=$(printf '%s' "${!raw}" | tr -d '[:space:]')
-            if [ -z "$value" ]; then
-              echo "::error::$name resolves to an empty value"
-              exit 1
-            fi
-            # The registered mask covers the untrimmed secret, which may differ.
-            echo "::add-mask::$value"
-            echo "$name=$value" >> "$GITHUB_ENV"
-          done
-
-      - name: Restore Dagger Engine Cache
-        continue-on-error: true
-        run: |
-          # Probed separately so a miss doesn't tear down the pipeline below. The error
-          # is echoed rather than swallowed: a bad credential is not a cache miss.
-          if ! size=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$KEY" --query ContentLength --output text 2>&1); then
-            case "$size" in
-              *404*|*"Not Found"*) echo "::notice::No engine cache at s3://$S3_BUCKET/$KEY, starting cold" ;;
-              *) echo "::error::Cannot read s3://$S3_BUCKET/$KEY, starting cold: $size" ;;
-            esac
-            exit 0
-          fi
-
-          sudo mkdir -p /var/lib/dagger
-          echo "Restoring $(numfmt --to=iec-i --suffix=B --format='%.1f' "$size") from s3://$S3_BUCKET/$KEY"
-          aws s3 cp "s3://$S3_BUCKET/$KEY" - \
-            | zstd -d \
-            | sudo tar -x -p --numeric-owner --xattrs --xattrs-include='*' -C /var/lib/dagger
-
-      - name: Start Dagger Engine
-        run: >-
-          docker run -d
-          --name dagger-engine
-          --privileged
-          -v "/var/lib/dagger:/var/lib/dagger"
-          -v "$PWD/dagger-engine.json:/etc/dagger/engine.json"
-          "${{ steps.dagger-version.outputs.engine-image }}"
+      - name: Set up dagger engine
+        id: engine
+        uses: ./.github/actions/dagger-engine
+        with:
+          age-key: ${{ secrets.AGE_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          s3-endpoint: ${{ secrets.S3_ENDPOINT }}
+          s3-bucket: ${{ secrets.S3_BUCKET }}
 
       - name: Run Dagger Build
         uses: dagger/dagger-for-github@v8.4.1
@@ -107,12 +53,28 @@ jobs:
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
           _EXPERIMENTAL_DAGGER_RUNNER_HOST: container+docker://dagger-engine
         with:
-          version: ${{ steps.dagger-version.outputs.version }}
+          version: ${{ steps.engine.outputs.dagger-version }}
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
           call: >-
             build
             --mok=file://./secrets/mok.key
 
+      # Obtained from the module so future images are captured as well
+      - name: Collect image names
+        id: images
+        env:
+          DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
+          _EXPERIMENTAL_DAGGER_RUNNER_HOST: container+docker://dagger-engine
+        run: |
+          # dagger writes its progress log to stderr, so stdout is only the JSON array.
+          images=$(dagger call image-names --mok=file://./secrets/mok.key)
+          # An unusable value would otherwise surface as a matrix error in a job that has
+          # none of this context.
+          jq -e 'type == "array" and length > 0' <<<"$images" > /dev/null
+          echo "images=$images" >> "$GITHUB_OUTPUT"
+
+      # The cache is only consistent once the engine has flushed and exited, and the push
+      # jobs restore it from S3 rather than from this runner.
       - name: Stop Dagger Engine
         if: always()
         run: docker stop dagger-engine -t 300
@@ -131,6 +93,22 @@ jobs:
           # is what decides how big the upload is. One walk, reported in MB.
           sudo du -sch /var/lib/dagger/worker/content /var/lib/dagger/worker/snapshots
 
+          # The parts of an upload that never completed are billed like stored data, and
+          # cancel-in-progress interrupts this step from time to time. Nothing else writes
+          # this key while this run holds the concurrency group, so whatever is still open
+          # here was left behind by an earlier run.
+          if ! uploads=$(aws s3api list-multipart-uploads --bucket "$S3_BUCKET" --prefix "$KEY" --query 'Uploads[].UploadId' --output text 2>&1); then
+            echo "::warning::Cannot list multipart uploads of s3://$S3_BUCKET/$KEY: $uploads"
+            uploads=""
+          fi
+          if [ "$uploads" = "None" ]; then
+            uploads=""
+          fi
+          for id in $uploads; do
+            echo "Aborting leftover multipart upload $id"
+            aws s3api abort-multipart-upload --bucket "$S3_BUCKET" --key "$KEY" --upload-id "$id"
+          done
+
           # The upload length is unknown up front, so every part is buffered in memory:
           # this caps that at concurrency * chunksize.
           aws configure set default.s3.max_concurrent_requests 16
@@ -146,22 +124,45 @@ jobs:
           size=$(aws s3api head-object --bucket "$S3_BUCKET" --key "$KEY" --query ContentLength --output text)
           echo "Uploaded $(numfmt --to=iec-i --suffix=B --format='%.1f' "$size") to s3://$S3_BUCKET/$KEY"
 
-      - name: Start Dagger Engine
-        if: success() && github.ref == 'refs/heads/main'
-        run: docker start dagger-engine
+  push:
+    name: Push ${{ matrix.image }}
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      # One image failing to push says nothing about the others.
+      fail-fast: false
+      matrix:
+        image: ${{ fromJSON(needs.build.outputs.images) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Restores the archive the build job just uploaded, so building the image below is
+      # a cache hit and only the rechunk actually runs here.
+      - name: Set up dagger engine
+        id: engine
+        uses: ./.github/actions/dagger-engine
+        with:
+          age-key: ${{ secrets.AGE_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          s3-endpoint: ${{ secrets.S3_ENDPOINT }}
+          s3-bucket: ${{ secrets.S3_BUCKET }}
 
       - name: Run Dagger Push
-        if: success() && github.ref == 'refs/heads/main'
         uses: dagger/dagger-for-github@v8.4.1
         env:
           GITHUB_TOKEN: ${{ github.token }}
           DAGGER_CLOUD_TOKEN: ${{ secrets.DAGGER_CLOUD_TOKEN }}
           _EXPERIMENTAL_DAGGER_RUNNER_HOST: container+docker://dagger-engine
         with:
-          version: ${{ steps.dagger-version.outputs.version }}
+          version: ${{ steps.engine.outputs.dagger-version }}
           cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
           call: >-
             build-and-push
+            --image-name=${{ matrix.image }}
             --mok=file://./secrets/mok.key
             --cosign-key=file://./secrets/cosign.key
             --revision=${{ github.sha }}
@@ -172,10 +173,18 @@ jobs:
             --is-pr=${{ github.event_name == 'pull_request' && 'true' || 'false' }}
             --pr-number="${{ github.event.pull_request.number }}"
 
+  notify:
+    name: Signal result to healthchecks.io
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    needs:
+      - build
+      - push
+    runs-on: ubuntu-latest
+    steps:
       - name: Signal build success to healthchecks.io
-        if: success() && github.ref == 'refs/heads/main'
+        if: ${{ needs.build.result == 'success' && needs.push.result == 'success' }}
         run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}" || true
 
       - name: Signal build failure to healthchecks.io
-        if: failure() && github.ref == 'refs/heads/main'
+        if: ${{ needs.build.result != 'success' || needs.push.result != 'success' }}
         run: curl -fsS --retry 3 "${{ secrets.HEALTHCHECKS_IO_URL }}/fail" || true
