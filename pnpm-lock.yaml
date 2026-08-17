@@ -10,7 +10,7 @@ importers:
     dependencies:
       smol-toml:
         specifier: ^1.6.1
-        version: 1.7.1
+        version: 1.8.0
       typescript:
         specifier: ^6.0.0
         version: 6.0.3
@@ -24,8 +24,8 @@ packages:
   '@types/node@25.9.5':
     resolution: {integrity: sha512-OScDchr2fwuUmWdf4kZ9h7PcJiYDVInhJizG/biAq3cAvqwYktuy/TYGGdZNMtNTFUP7rnb0NU4TUdm82kt4Rg==}
 
-  smol-toml@1.7.1:
-    resolution: {integrity: sha512-PPlsspAZ4jbMBu5DMFhfUGDQLu/vrL4SyBROVS37x8ynnVmFIs1VPBz1Co8Xks3TvpIaZXmU85y4DrQ+UyVFoQ==}
+  smol-toml@1.8.0:
+    resolution: {integrity: sha512-kCZr2V3ch9i00x8zXRhjUNVcjG9ijES5dDudkXvUVCT5QlJNQWElSJdZqyPemffHoLNUYwOcou0Fy+ojN0uHSQ==}
     engines: {node: '>= 18'}
 
   typescript@6.0.3:
@@ -42,7 +42,7 @@ snapshots:
     dependencies:
       undici-types: 7.24.6
 
-  smol-toml@1.7.1: {}
+  smol-toml@1.8.0: {}
 
   typescript@6.0.3: {}
 
