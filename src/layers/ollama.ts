@@ -13,7 +13,7 @@ export class OllamaLayer extends GenericLayer {
 
     async build(buildContainer: Container): Promise<Directory> {
         const baseUrl =
-            "https://github.com/ollama/ollama/releases/download/v0.32.6";
+            "https://github.com/ollama/ollama/releases/download/v0.32.15";
         const version = baseUrl.split("/").at(-1)?.slice(1);
         if (!version) {
             throw new Error("Version not found");
