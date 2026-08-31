@@ -5,3 +5,9 @@
 
 *.key
 /.direnv
+
+# VM artifacts from `just disk` / `just quick`
+/vm/output
+/vm/run
+/vm/quick
+/vm/*.oci.tar

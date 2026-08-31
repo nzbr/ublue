@@ -1,0 +1,14 @@
+# Customizations for `just disk`, applied by bootc-image-builder.
+#
+# The images create no user accounts of their own (that is Anaconda's job on a real
+# install), so without an entry here the resulting disk image has no way to log in.
+# This is a throwaway test VM, hence the throwaway password.
+
+[[customizations.user]]
+name = "nzbr"
+password = "test"
+groups = ["wheel"]
+
+# Gives the VM a serial console, so `just run` also works without a graphical session.
+[customizations.kernel]
+append = "console=ttyS0,115200"
