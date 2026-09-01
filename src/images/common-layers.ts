@@ -4,6 +4,8 @@ import {
     NoFlatpakAutoUpdateLayer,
     RpmOstreeTweaksLayer,
     SudoTweaksLayer,
+    TerraLayer,
+    VicinaeLayer,
 } from "../layers";
 
 export const commonLayers = [
@@ -12,4 +14,6 @@ export const commonLayers = [
     new SudoTweaksLayer(),
     new NixLayer(),
     new CopperflameMonoLayer(),
+    new TerraLayer(),
+    new VicinaeLayer(),
 ];

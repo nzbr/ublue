@@ -13,3 +13,5 @@ export * from "./no-flatpak-auto-update";
 export * from "./onepassword";
 export * from "./rpm-ostree-tweaks";
 export * from "./sudo-tweaks";
+export * from "./terra";
+export * from "./vicinae";

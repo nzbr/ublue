@@ -1,7 +1,5 @@
-import * as fs from "fs";
-import * as path from "path";
 import { Container, dag, Directory } from "@dagger.io/dagger";
-import { GenericLayer, mkRPM, unindent } from "../../lib";
+import { GenericLayer, mkRPM, sourceFileIn, unindent } from "../../lib";
 
 const GID_ONEPASSWORD = 1500;
 const GID_ONEPASSWORDCLI = 1600;
@@ -11,8 +9,7 @@ const BROWSER_SUPPORT_PATH = "/usr/lib/1Password/1Password-BrowserSupport";
 const MCP_PATH = "/usr/lib/1Password/1password-mcp";
 const CLI_PATH = "/usr/bin/op";
 
-const sourceFile = (name: string) =>
-    fs.readFileSync(path.resolve(import.meta.dirname, name), "utf-8");
+const sourceFile = sourceFileIn(import.meta.dirname);
 
 export class OnepasswordLayer extends GenericLayer {
     name = "onepassword";
