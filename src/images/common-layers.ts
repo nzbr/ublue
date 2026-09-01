@@ -1,5 +1,6 @@
 import {
     CopperflameMonoLayer,
+    GhosttyLayer,
     NixLayer,
     NoFlatpakAutoUpdateLayer,
     RpmOstreeTweaksLayer,
@@ -16,4 +17,5 @@ export const commonLayers = [
     new CopperflameMonoLayer(),
     new TerraLayer(),
     new VicinaeLayer(),
+    new GhosttyLayer(),
 ];
