@@ -23,6 +23,6 @@ export class CiderLayer extends GenericLayer {
         cp "./cidercollective.asc" /etc/pki/rpm-gpg/RPM-GPG-KEY-cidercollective
         rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-cidercollective
 
-        dnf install -y Cider
+        dnf install -y --from-repo=cidercollective Cider
     `;
 }

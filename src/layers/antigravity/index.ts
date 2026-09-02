@@ -15,6 +15,6 @@ export class AntigravityLayer extends GenericLayer {
     installScript = `
         cp ./antigravity.repo /etc/yum.repos.d/antigravity.repo
 
-        dnf install -y antigravity
+        dnf install -y --from-repo=antigravity-rpm antigravity
     `;
 }

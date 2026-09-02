@@ -6,6 +6,6 @@ export class KdeDarklyLayer extends GenericLayer {
     installScript = `
         # darkly is not in the Fedora repos, only in terra, so that layer has to
         # be included before this one
-        dnf install -y darkly
+        dnf install -y --from-repo=terra darkly
     `;
 }

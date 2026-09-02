@@ -11,7 +11,7 @@ export class VicinaeLayer extends GenericLayer {
 
     installScript = `
         # The terra layer needs to be included before this one
-        dnf install -y vicinae
+        dnf install -y --from-repo=terra vicinae
 
         install -m644 70-vicinae-uinput.rules /usr/lib/udev/rules.d/70-vicinae-uinput.rules
 

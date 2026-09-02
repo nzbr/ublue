@@ -20,7 +20,8 @@ export class OnepasswordLayer extends GenericLayer {
             .withNewFile("/etc/pki/rpm-gpg/RPM-GPG-KEY-1password", sourceFile("1password.asc"))
             .withExec(["rpm", "--import", "/etc/pki/rpm-gpg/RPM-GPG-KEY-1password"])
             .withDirectory("/tmp/rpms", dag.directory())
-            .withExec(["dnf", "download", "-y", "--destdir=/tmp/rpms", "1password", "1password-cli"])
+            .withExec(["bash", "-euo", "pipefail", "-c",
+                "dnf download -y --arch=$(uname -m) --from-repo=1password --destdir=/tmp/rpms 1password 1password-cli"])
             .withDirectory("/rpms", dag.directory())
             .withExec(["bash", "-euo", "pipefail", "-c", unindent`
                 # dnf download verifies nothing by itself
