@@ -23,15 +23,14 @@ export abstract class Image {
         return (
             await this.layers.reduce<Promise<Container>>(
                 async (state, layer) =>
-                    (await layer.install(container, await state)).withExec([
-                        "ostree",
-                        "container",
-                        "commit",
-                    ]),
+                    await layer.install(container, await state),
                 Promise.resolve(container),
             )
         )
             .withExec(["rm", "-rf", "/var/cache"])
+            // Once, at the end: the layers are rechunked on push anyway, so a
+            // commit per layer only costs build time.
+            .withExec(["ostree", "container", "commit"])
             .withoutWorkdir()
             .withDefaultTerminalCmd([
                 "/bin/sh",
