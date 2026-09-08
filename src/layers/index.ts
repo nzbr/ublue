@@ -3,6 +3,7 @@ export * from "./copperflame-mono";
 export * from "./container-runtimes";
 export * from "./ecryptfs";
 export * from "./ghostty";
+export * from "./incus-sleep";
 export * from "./kde/kde-darkly";
 export * from "./kde/kde-rounded-corners";
 export * from "./kde/klassy";

@@ -1,6 +1,7 @@
 import {
     CopperflameMonoLayer,
     GhosttyLayer,
+    IncusSleepLayer,
     NixLayer,
     NoFlatpakAutoUpdateLayer,
     RpmOstreeTweaksLayer,
@@ -13,6 +14,7 @@ export const commonLayers = [
     new RpmOstreeTweaksLayer(),
     new NoFlatpakAutoUpdateLayer(),
     new SudoTweaksLayer(),
+    new IncusSleepLayer(),
     new NixLayer(),
     new CopperflameMonoLayer(),
     new TerraLayer(),
