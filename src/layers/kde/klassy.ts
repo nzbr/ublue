@@ -5,7 +5,7 @@ import { fetchGit, GenericLayer, mkRPM } from "../../lib";
 export class KlassyLayer extends GenericLayer {
     name = "klassy";
 
-    src = fetchGit("https://github.com/paulmcauley/klassy.git", "v6.5.3");
+    src = fetchGit("https://github.com/paulmcauley/klassy.git", "v6.7.2");
 
     async build(buildContainer: Container): Promise<Directory> {
         const packages = [
