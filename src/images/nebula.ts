@@ -17,10 +17,14 @@ class KernelVersionCheckLayer extends GenericLayer {
 
         KERNEL_VERSION=$(rpm -q kernel --qf '%{VERSION}-%{RELEASE}.%{ARCH}\n')
 
-        if [[ "$KERNEL_VERSION" == 6.18.* ]]; then
-            echo "Error: Kernel version \${KERNEL_VERSION} is known to be broken on this machine."
-            exit 1
-        fi
+        # 7.1.6 and 7.1.7 send page-flip-done before the hardware has latched the flip,
+        # so the compositor draws into the buffer that is still on screen
+        case "$KERNEL_VERSION" in
+            6.18.* | 7.1.6-* | 7.1.7-*)
+                echo "Error: Kernel version \${KERNEL_VERSION} is known to be broken on this machine."
+                exit 1
+                ;;
+        esac
     `);
 }
 
