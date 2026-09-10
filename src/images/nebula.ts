@@ -1,5 +1,5 @@
 import { File, Secret } from "@dagger.io/dagger";
-import { CiderLayer, ContainerRuntimesLayer, EcryptfsLayer, MotorcommYT6801Layer, NerdctlLayer } from "../layers";
+import { CiderLayer, CodeOnIncusLayer, ContainerRuntimesLayer, EcryptfsLayer, MotorcommYT6801Layer, NerdctlLayer } from "../layers";
 import { OnepasswordLayer } from "../layers/onepassword";
 import { PamFprintdLayer } from "../layers/pam-fprintd";
 import { PAMU2FLayer } from "../layers/pam-u2f";
@@ -54,6 +54,7 @@ export default class NebulaImage extends Image {
             new AntigravityLayer(),
             new NerdctlLayer(),
             new ContainerRuntimesLayer(),
+            new CodeOnIncusLayer(),
         ];
     }
 }

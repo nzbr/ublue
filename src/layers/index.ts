@@ -1,4 +1,5 @@
 export * from "./cider";
+export * from "./code-on-incus";
 export * from "./copperflame-mono";
 export * from "./container-runtimes";
 export * from "./ecryptfs";
