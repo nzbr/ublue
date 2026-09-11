@@ -11,6 +11,7 @@ import BluefinDxImage from "./images/bluefin-dx";
 import AuroraDxImage from "./images/aurora-dx";
 import NebulaImage from "./images/nebula";
 import CosmicAtomicImage from "./images/cosmic-atomic";
+import BuildContainerImage from "./images/buildcontainer";
 import { pushChunked } from "./lib";
 import { Image } from "./lib/image";
 
@@ -34,6 +35,11 @@ export class Ublue {
     }
 
     @func()
+    buildcontainer(): Promise<Container> {
+        return new BuildContainerImage().build();
+    }
+
+    @func()
     nebula(
         mok: Secret,
         @argument({ defaultPath: "/secrets/mok.pub" }) mokPub: File,
@@ -49,6 +55,7 @@ export class Ublue {
             // new AuroraDxImage(),
             new BluefinDxImage(),
             new CosmicAtomicImage(),
+            new BuildContainerImage(),
             new NebulaImage(mok, mokPub),
         ]);
     }

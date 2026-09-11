@@ -1,4 +1,5 @@
 import {
+    CodeOnIncusLayer,
     CopperflameMonoLayer,
     GhosttyLayer,
     IncusSleepLayer,
@@ -21,3 +22,5 @@ export const commonLayers = [
     new VicinaeLayer(),
     new GhosttyLayer(),
 ];
+
+export const workLayers = [new CodeOnIncusLayer()];

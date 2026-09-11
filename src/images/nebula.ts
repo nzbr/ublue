@@ -1,13 +1,20 @@
 import { File, Secret } from "@dagger.io/dagger";
-import { CiderLayer, CodeOnIncusLayer, ContainerRuntimesLayer, EcryptfsLayer, MotorcommYT6801Layer, NerdctlLayer } from "../layers";
+import {
+    CiderLayer,
+    ContainerRuntimesLayer,
+    EcryptfsLayer,
+    MotorcommYT6801Layer,
+    NerdctlLayer,
+} from "../layers";
 import { OnepasswordLayer } from "../layers/onepassword";
 import { PamFprintdLayer } from "../layers/pam-fprintd";
 import { PAMU2FLayer } from "../layers/pam-u2f";
 import { Image, Layer } from "../lib";
 import { GenericLayer } from "../lib/layer";
 import { unindent } from "../lib/unindent";
-import CosmicAtomicImage from "./cosmic-atomic";
 import { AntigravityLayer } from "../layers/antigravity";
+import CosmicAtomicImage from "./cosmic-atomic";
+import { workLayers } from "./common-layers";
 
 class KernelVersionCheckLayer extends GenericLayer {
     name = "kernel-version-check";
@@ -44,6 +51,7 @@ export default class NebulaImage extends Image {
 
         this.layers = [
             new KernelVersionCheckLayer(),
+            ...workLayers,
             new EcryptfsLayer(),
             new OnepasswordLayer(),
             new CiderLayer(),
@@ -54,7 +62,6 @@ export default class NebulaImage extends Image {
             new AntigravityLayer(),
             new NerdctlLayer(),
             new ContainerRuntimesLayer(),
-            new CodeOnIncusLayer(),
         ];
     }
 }
