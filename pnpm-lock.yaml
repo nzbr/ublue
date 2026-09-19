@@ -17,12 +17,12 @@ importers:
     devDependencies:
       '@types/node':
         specifier: ^25.0.0
-        version: 25.9.6
+        version: 25.9.8
 
 packages:
 
-  '@types/node@25.9.6':
-    resolution: {integrity: sha512-JR6Q/PV5DKFvjrGFVqQJdeG0qvsqQQLDa3TzFrqVwhqRXqwNaxPo2KYCtCQXpOdIulCouKwT7a6in9nFthBAzw==}
+  '@types/node@25.9.8':
+    resolution: {integrity: sha512-VfMrScDmMhUJQmd5hArdQnFvK0OIeD36uN2Va1FcpYaLB/BgkgM8Ulc50XtYISPMz7APJ30+N0T5EM0jlcdfRw==}
 
   smol-toml@1.8.0:
     resolution: {integrity: sha512-kCZr2V3ch9i00x8zXRhjUNVcjG9ijES5dDudkXvUVCT5QlJNQWElSJdZqyPemffHoLNUYwOcou0Fy+ojN0uHSQ==}
@@ -38,7 +38,7 @@ packages:
 
 snapshots:
 
-  '@types/node@25.9.6':
+  '@types/node@25.9.8':
     dependencies:
       undici-types: 7.24.6
 
