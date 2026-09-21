@@ -10,14 +10,18 @@ export class ContainerRuntimesLayer implements Layer {
         const arch = platform === "linux/arm64" ? "aarch64" : "x86_64";
         const baseUrl = `https://storage.googleapis.com/gvisor/releases/release/latest/${arch}`;
 
-        const runscDownload = dag.http(`${baseUrl}/runsc`);
-        const checksum = dag.http(`${baseUrl}/runsc.sha512`);
 
-        const runsc = buildContainer
-            .withFile("/runsc", runscDownload)
-            .withFile("/runsc.sha512", checksum)
-            .withExec(["bash", "-c", "cd / && sha512sum -c runsc.sha512"])
-            .file("/runsc");
+        const tarball = dag.http(`${baseUrl}/gvisor.tar.zstd`);
+        const checksum = dag.http(`${baseUrl}/gvisor.tar.zstd.sha512`);
+
+        const gvisor = buildContainer
+            .withWorkdir("/gvisor")
+            .withFile("/gvisor/gvisor.tar.zstd", tarball)
+            .withFile("/gvisor/gvisor.tar.zstd.sha512", checksum)
+            .withExec(["sha512sum", "-c", "gvisor.tar.zstd.sha512"])
+            .withExec(["mkdir", "/gvisor/bin"])
+            .withExec(["tar", "--zstd", "-xf", "gvisor.tar.zstd", "-C", "/gvisor/bin"])
+            .directory("/gvisor/bin");
 
         const uname = targetContainer.file("/usr/bin/uname");
         const fakeUname = dag.file("uname", unindent`
@@ -28,7 +32,9 @@ export class ContainerRuntimesLayer implements Layer {
         `)
 
         const withRuntimes = targetContainer
-            .withFile("/usr/bin/runsc", runsc, { permissions: 0o755 })
+
+            .withDirectory("/usr/bin", gvisor)
+            .withExec(["runsc", "--version",])
             .withExec(["runsc", "install"])
             .withMountedFile("/usr/bin/uname.real", uname)
             .withMountedFile("/usr/bin/uname", fakeUname)
