@@ -4,7 +4,7 @@ import { fetchGit, GenericLayer, mkRPM, unindent } from "../lib";
 export class CodeOnIncusLayer extends GenericLayer {
     name = "code-on-incus";
 
-    src = fetchGit("https://github.com/mensfeld/code-on-incus.git", "v0.12.0");
+    src = fetchGit("https://github.com/mensfeld/code-on-incus.git", "v0.13.0");
 
     async build(buildContainer: Container): Promise<Directory> {
         const version = this.src.ref.replace(/^v/, "");
