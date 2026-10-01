@@ -5,7 +5,7 @@ export class NixLayer extends GenericLayer {
 
     src = fetchGit(
         "https://github.com/DeterminateSystems/nix-installer.git",
-        "v3.22.5",
+        "v3.23.0",
     ).directory("src/action/linux/selinux");
 
     // mirrors upstream's build.sh
