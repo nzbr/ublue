@@ -29,6 +29,8 @@ export class XrdpLayer extends GenericLayer {
         xrdp-selinux \
         plasma-workspace-x11
 
+      install -Dm755 startwm-plasma.sh /usr/libexec/xrdp/startwm-plasma.sh
+
       grep -q '^DefaultWindowManager=' /etc/xrdp/sesman.ini # Make sure the sed below keeps working
       sed -i \
           's|^DefaultWindowManager=.*|DefaultWindowManager=/usr/libexec/xrdp/startwm-plasma.sh|' \
