@@ -11,7 +11,7 @@ import BluefinDxImage from "./images/bluefin-dx";
 import AuroraDxImage from "./images/aurora-dx";
 import NebulaImage from "./images/nebula";
 import CosmicAtomicImage from "./images/cosmic-atomic";
-import BuildContainerImage from "./images/buildcontainer";
+import BorealisImage from "./images/borealis";
 import { pushChunked } from "./lib";
 import { Image } from "./lib/image";
 
@@ -35,8 +35,8 @@ export class Ublue {
     }
 
     @func()
-    buildcontainer(): Promise<Container> {
-        return new BuildContainerImage().build();
+    borealis(): Promise<Container> {
+        return new BorealisImage().build();
     }
 
     @func()
@@ -55,7 +55,7 @@ export class Ublue {
             // new AuroraDxImage(),
             new BluefinDxImage(),
             new CosmicAtomicImage(),
-            new BuildContainerImage(),
+            new BorealisImage(),
             new NebulaImage(mok, mokPub),
         ]);
     }

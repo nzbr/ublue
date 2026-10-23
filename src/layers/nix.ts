@@ -86,6 +86,7 @@ export class NixLayer extends GenericLayer {
     installScript = `
         dnf install -y \
             nix \
+            nix-daemon \
             nix-legacy
 
         cat nix.conf.append >>/etc/nix/nix.conf

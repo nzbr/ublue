@@ -3,6 +3,10 @@ import {
     CopperflameMonoLayer,
     GhosttyLayer,
     IncusSleepLayer,
+    KdeDarklyLayer,
+    KdeRoundedCornersLayer,
+    KlassyLayer,
+    KWinEffectsBetterBlurDxLayer,
     NixLayer,
     NoFlatpakAutoUpdateLayer,
     RpmOstreeTweaksLayer,
@@ -23,4 +27,11 @@ export const commonLayers = [
     new GhosttyLayer(),
 ];
 
-export const workLayers = [new CodeOnIncusLayer()];
+export const kdeLayers = [
+    new KdeDarklyLayer(),
+    new KdeRoundedCornersLayer(),
+    new KlassyLayer(),
+    new KWinEffectsBetterBlurDxLayer(),
+];
+
+export const dxLayers = [new CodeOnIncusLayer()];

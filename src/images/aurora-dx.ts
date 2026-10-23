@@ -1,11 +1,5 @@
-import {
-    KdeDarklyLayer,
-    KdeRoundedCornersLayer,
-    KlassyLayer,
-    KWinEffectsForceblurLayer,
-} from "../layers";
 import { Image } from "../lib";
-import { commonLayers } from "./common-layers";
+import { commonLayers, dxLayers, kdeLayers } from "./common-layers";
 
 export default class AuroraDxImage extends Image {
     name = "aurora-dx";
@@ -13,10 +7,7 @@ export default class AuroraDxImage extends Image {
 
     layers = [
         ...commonLayers,
-        new KdeDarklyLayer(),
-        new KdeRoundedCornersLayer(),
-        new KlassyLayer(),
-        new KWinEffectsForceblurLayer(),
-        // yin-yang
+        ...dxLayers,
+        ...kdeLayers,
     ];
 }

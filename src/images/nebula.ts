@@ -14,7 +14,6 @@ import { GenericLayer } from "../lib/layer";
 import { unindent } from "../lib/unindent";
 import { AntigravityLayer } from "../layers/antigravity";
 import CosmicAtomicImage from "./cosmic-atomic";
-import { workLayers } from "./common-layers";
 
 class KernelVersionCheckLayer extends GenericLayer {
     name = "kernel-version-check";
@@ -51,7 +50,6 @@ export default class NebulaImage extends Image {
 
         this.layers = [
             new KernelVersionCheckLayer(),
-            ...workLayers,
             new EcryptfsLayer(),
             new OnepasswordLayer(),
             new CiderLayer(),
