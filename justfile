@@ -65,7 +65,8 @@ vm-disk host type="qcow2" rootfs="ext4": (oci-load host)
     sudo chown -R "$(id -u):$(id -g)" vm/output
 
 # Boot a disk image from `just disk`. secureboot=yes boots it on Secure Boot firmware.
-vm-run host type="qcow2" secureboot="no":
+[arg("port_forwards", long="port-forwards")]
+vm-run host type="qcow2" secureboot="no" port_forwards="tcp:127.0.0.1:2222-:22":
     #!/usr/bin/env -S nix develop -c bash
     set -ex
     disk=vm/output/{{type}}/disk.{{type}}
@@ -95,17 +96,26 @@ vm-run host type="qcow2" secureboot="no":
         gfx=(-display none -vnc 127.0.0.1:1)
     fi
 
+    port_forwards={{quote(port_forwards)}}
+    netdev="user,id=n0"
+    IFS=' ' read -r -a port_forward_args <<< "$port_forwards"
+    for forward in "${port_forward_args[@]}"; do
+        [ -n "$forward" ] || continue
+        netdev+=",hostfwd=$forward"
+    done
+
     qemu-system-x86_64 \
         -enable-kvm -cpu host -m 8G -smp 4 "${machine[@]}" \
         -drive if=pflash,format=raw,unit=0,readonly=on,file="$firmware/OVMF_CODE.fd" \
         -drive if=pflash,format=raw,unit=1,file="$vars" \
         -device virtio-vga "${gfx[@]}" \
-        -netdev user,id=n0,hostfwd=tcp:127.0.0.1:2222-:22 -device virtio-net-pci,netdev=n0 \
+        -netdev "$netdev" -device virtio-net-pci,netdev=n0 \
         -drive file="$disk",format={{type}},if=virtio,cache=writeback \
         -serial mon:stdio
 
 # Boot an image's rootfs directly (minutes, not half an hour) while iterating on a layer
-vm-quick host password="test": (oci-load host)
+[arg("port_forwards", long="port-forwards")]
+vm-quick host password="test" port_forwards="": (oci-load host)
     #!/usr/bin/env bash
     set -ex
     # Skips bootloader and ostree entirely, so it does NOT test the deployment:
@@ -155,13 +165,21 @@ vm-quick host password="test": (oci-load host)
     trap - EXIT
 
     # boot the kernel out of the image itself; log in as root on this terminal
+    port_forwards={{quote(port_forwards)}}
+    netdev="user,id=n0"
+    IFS=' ' read -r -a port_forward_args <<< "$port_forwards"
+    for forward in "${port_forward_args[@]}"; do
+        [ -n "$forward" ] || continue
+        netdev+=",hostfwd=$forward"
+    done
+
     qemu-system-x86_64 \
         -enable-kvm -cpu host -m 8G -smp 4 -machine q35 -no-reboot \
         -display gtk -device virtio-vga,edid=on,xres=1920,yres=1080 \
         -kernel "$work/vmlinuz" -initrd "$work/initramfs.img" \
         -append "root=/dev/vda rw rootfstype=ext4 console=ttyS0,115200 video=Virtual-1:1920x1080@60e selinux=0 enforcing=0" \
         -drive file="$work/root.ext4",format=raw,if=virtio,cache=unsafe \
-        -netdev user,id=n0 -device virtio-net-pci,netdev=n0 \
+        -netdev "$netdev" -device virtio-net-pci,netdev=n0 \
         -serial mon:stdio
 
 # Remove disk images and VM scratch (keeps vm/config.toml)
