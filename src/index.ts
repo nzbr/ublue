@@ -131,6 +131,17 @@ export class Ublue {
                 ],
                 { stdin: await password.plaintext() },
             )
+            .withExec([
+                "cosign",
+                "signing-config",
+                "create",
+                "--no-default-fulcio",
+                "--no-default-oidc",
+                "--no-default-rekor",
+                "--no-default-tsa",
+                "--out",
+                "/tmp/signing-config.json",
+            ])
             .withMountedSecret("/secrets/cosign.key", cosignKey, {
                 owner: `${await cosignContainer.user()}`,
                 mode: 0o600,
@@ -184,6 +195,9 @@ export class Ublue {
                         "sign",
                         "--key",
                         "/secrets/cosign.key",
+                        "--new-bundle-format",
+                        "--signing-config",
+                        "/tmp/signing-config.json",
                         `${repository}@${digest}`,
                     ])
                     .sync();
