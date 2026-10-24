@@ -13,6 +13,7 @@ import {
     SudoTweaksLayer,
     TerraLayer,
     VicinaeLayer,
+    WaypipeLayer,
 } from "../layers";
 
 export const commonLayers = [
@@ -25,6 +26,7 @@ export const commonLayers = [
     new TerraLayer(),
     new VicinaeLayer(),
     new GhosttyLayer(),
+    new WaypipeLayer(),
 ];
 
 export const kdeLayers = [

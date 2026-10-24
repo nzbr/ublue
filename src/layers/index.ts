@@ -18,4 +18,5 @@ export * from "./rpm-ostree-tweaks";
 export * from "./sudo-tweaks";
 export * from "./terra";
 export * from "./vicinae";
+export * from "./waypipe";
 export * from "./xrdp";
