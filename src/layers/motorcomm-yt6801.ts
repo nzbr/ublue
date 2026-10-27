@@ -43,7 +43,7 @@ export class MotorcommYT6801Layer implements Layer {
 
         const src = fetchGit(
             "https://gitlab.com/tuxedocomputers/development/packages/tuxedo-yt6801.git",
-            "v1.0.30tux5",
+            "v1.0.32",
         ).withNewFile("build.sh", buildScript, { permissions: 0o755 });
 
         const kernelModule = buildContainer
