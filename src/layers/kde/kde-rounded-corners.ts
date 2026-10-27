@@ -7,7 +7,7 @@ export class KdeRoundedCornersLayer extends GenericLayer {
 
     src = fetchGit(
         "https://github.com/matinlotfali/KDE-Rounded-Corners",
-        "v0.10.0",
+        "v0.11.0",
     );
 
     async build(buildContainer: Container): Promise<Directory> {
