@@ -10,11 +10,20 @@
     'nzbr',
   ],
   automergeStrategy: 'squash',
+  automerge: true,
+  platformAutomerge: false,
+  minimumReleaseAge: '14 days',
+  minimumReleaseAgeBuffer: null,
+  internalChecksFilter: 'none',
+  prCreation: 'immediate',
   labels: [
     'renovate',
   ],
   nix: {
     enabled: true,
+  },
+  npm: {
+    rangeStrategy: 'pin',
   },
   lockFileMaintenance: {
     enabled: true,
@@ -22,13 +31,26 @@
       'schedule:weekly',
     ],
     automerge: true,
+    minimumReleaseAge: null,
+  },
+  vulnerabilityAlerts: {
+    automerge: false,
   },
   packageRules: [
     {
-      matchManagers: ['regex'],
+      matchManagers: ['custom.regex'],
       matchDatasources: ['docker'],
       versioning: 'regex:^(?<compatibility>.+)-(?<major>\\d+)\\.(?<minor>\\d+)$',
       automerge: true,
+      minimumReleaseAge: null,
+      platformAutomerge: true,
+      pinDigests: true,
+    },
+    {
+      matchManagers: ['npm'],
+      matchUpdateTypes: ['pin'],
+      minimumReleaseAge: null,
+      automerge: false,
     },
   ],
   customManagers: [
@@ -38,9 +60,10 @@
         '/^.*\\.[jt]s$/',
       ],
       matchStrings: [
-        'from\\s*=\\s*["\'](?<depName>[^:]+):(?<currentValue>[^\\"]+)["\']',
+        'from\\s*=\\s*["\'](?<depName>[^:]+):(?<currentValue>[^@"\']+)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?["\']',
       ],
       datasourceTemplate: 'docker',
+      autoReplaceStringTemplate: 'from = "{{{depName}}}:{{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}"',
     },
     {
       customType: 'regex',
@@ -58,9 +81,30 @@
         '/^.*\\.[jt]s$/',
       ],
       matchStrings: [
-        'fetchGit\\s*\\(\\s*"(?<depName>[^"]+)"\\s*,\\s*"(?<currentValue>[^"]+)',
+        'fetchGit\\s*\\(\\s*"https://github\\.com/(?<depName>[^"]+?)(?:\\.git)?"\\s*,\\s*"(?<currentValue>[^"]+)',
       ],
-      datasourceTemplate: 'git-tags',
+      datasourceTemplate: 'github-tags',
+    },
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^.*\\.[jt]s$/',
+      ],
+      matchStrings: [
+        'fetchGit\\s*\\(\\s*"https://gitlab\\.com/(?<depName>[^"]+?)(?:\\.git)?"\\s*,\\s*"(?<currentValue>[^"]+)',
+      ],
+      datasourceTemplate: 'gitlab-tags',
+    },
+    {
+      customType: 'regex',
+      managerFilePatterns: [
+        '/^.*\\.[jt]s$/',
+      ],
+      matchStrings: [
+        'fetchGit\\s*\\(\\s*"https://gitlab\\.freedesktop\\.org/(?<depName>[^"]+?)(?:\\.git)?"\\s*,\\s*"(?<currentValue>[^"]+)',
+      ],
+      datasourceTemplate: 'gitlab-tags',
+      registryUrlTemplate: 'https://gitlab.freedesktop.org',
     },
     {
       customType: 'regex',
