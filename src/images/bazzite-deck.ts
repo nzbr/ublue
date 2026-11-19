@@ -3,7 +3,7 @@ import { commonLayers, kdeLayers } from "./common-layers";
 
 export default class BazziteDeckImage extends Image {
     name = "bazzite-deck";
-    from = "ghcr.io/ublue-os/bazzite-deck:stable-44.20261026@sha256:278941ea67603e24e24ff18e8c418b91f2f326fffd3d24edcff9779f36fbdf4e";
+    from = "ghcr.io/ublue-os/bazzite-deck:stable-45.20261117@sha256:6662139c6170a8316fc53936a7b49ab9aacf52d3369efe86cdaf4c63e795567b";
 
     layers = [
         ...commonLayers,
